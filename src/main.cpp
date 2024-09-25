@@ -1130,12 +1130,27 @@ serverSetup();
 
 const char sysVersion[] = (STR(FW_VERSION) "." STR(FW_SUBVERSION) "." STR(FW_HOTFIX) " " FW_BRANCH " " AUTO_VERSION);
 
-void setup() {
-// Start serial console
-Serial.begin(115200);
+#include <WiFi.h>
 
-// Initialize the logger
-Logger::init(23);
+void setup() {
+    // Start serial console
+    Serial.begin(115200);
+
+    // Initialize the logger
+    Logger::init(23);
+
+
+
+
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(1000);
+        Serial.println("Verbinde...");
+    }
+
+    Serial.println("Verbunden!");
+
 
 editableVars["PID_ON"] = {
 .displayName = "Enable PID Controller", .hasHelpText = false, .helpText = "", .type = kUInt8, .section = sPIDSection, .position = 1, .show = [] { return true; }, .minValue = 0, .maxValue = 1, .ptr = (void*)&pidON};

@@ -58,6 +58,9 @@ String getMachineName(MACHINE machine) {
         case QuickMill:
             return "QuickMill";
 
+        case ECMClassikaII:
+            return "ECMClassikaII";
+
         default:
             return ""; // Handle any unknown or invalid values
     }
