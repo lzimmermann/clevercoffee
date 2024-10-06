@@ -1591,7 +1591,7 @@ mqttSensors["currentKp"] = [] { return bPID.GetKp(); };
 mqttSensors["currentKi"] = [] { return bPID.GetKi(); };
 mqttSensors["currentKd"] = [] { return bPID.GetKd(); };
 mqttSensors["machineState"] = [] { return machineState; };
-    mqttSensors["lastBrewTime"] = [] { return lastBrewTime; };
+mqttSensors["lastBrewTime"] = [] { return lastBrewTime; };
 
 #if FEATURE_PRESSURESENSOR == 1
 mqttSensors["pressure"] = [] { return inputPressureFilter; };
