@@ -13,7 +13,7 @@
 #include <os.h>
 
 unsigned long previousMillisMQTT;
-const unsigned long intervalMQTT = 1000;
+const unsigned long intervalMQTT = MQTT_INTERVAL_MS;
 
 WiFiClient net;
 PubSubClient mqtt(net);
