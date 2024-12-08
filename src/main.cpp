@@ -170,7 +170,11 @@ Switch* brewSwitch;
 Switch* steamSwitch;
 
 TempSensor* tempSensor;
+
+#if (FEATURE_SECONDARYTEMPERATURESENSOR == 1)
 TempSensor* tempSensor2;
+#endif
+
 #include "isr.h"
 
 // Method forward declarations
@@ -1710,11 +1714,9 @@ void setup() {
 
     temperature -= brewTempOffset;
 
-
-
 // Init Additional Temperature Sensors
-
-    if (TEMP_SENSOR_2== 1) {
+#if (FEATURE_SECONDARYTEMPERATURESENSOR == 1)
+    if (TEMP_SENSOR_2 == 1) {
         tempSensor2 = new TempSensorDallas(PIN_TEMPSENSOR);
     }
     else if (TEMP_SENSOR == 2) {
@@ -1722,10 +1724,7 @@ void setup() {
     }
 
     temperature2 = tempSensor2->getCurrentTemperature();
-
-//    temperature2 -= brewTempOffset;
-
-
+#endif
 
 
 // Init Scale
