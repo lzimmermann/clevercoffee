@@ -170,7 +170,7 @@ Switch* brewSwitch;
 Switch* steamSwitch;
 
 TempSensor* tempSensor;
-
+TempSensor* tempSensor2;
 #include "isr.h"
 
 // Method forward declarations
@@ -301,7 +301,7 @@ double setpointTemp;
 double previousInput = 0;
 
 // Variables to hold PID values (Temp input, Heater output)
-double temperature, pidOutput;
+double temperature, temperature2, pidOutput;
 int steamON = 0;
 int steamFirstON = 0;
 
@@ -1709,6 +1709,24 @@ void setup() {
     temperature = tempSensor->getCurrentTemperature();
 
     temperature -= brewTempOffset;
+
+
+
+// Init Additional Temperature Sensors
+
+    if (TEMP_SENSOR_2== 1) {
+        tempSensor2 = new TempSensorDallas(PIN_TEMPSENSOR);
+    }
+    else if (TEMP_SENSOR == 2) {
+        tempSensor2 = new TempSensorTSIC(PIN_TEMPSENSOR);
+    }
+
+    temperature2 = tempSensor2->getCurrentTemperature();
+
+//    temperature2 -= brewTempOffset;
+
+
+
 
 // Init Scale
 #if FEATURE_SCALE == 1
