@@ -122,9 +122,12 @@ unsigned int wifiReconnects = 0; // actual number of reconnects
 const char* OTApass = OTAPASS;
 
 // Backflush values
-const unsigned long fillTime = FILLTIME;
-const unsigned long flushTime = FLUSHTIME;
-int maxflushCycles = MAXFLUSHCYCLES;
+int backflushCycles = BACKFLUSH_CYCLES;
+double backflushFillTime = BACKFLUSH_FILL_TIME;
+double backflushFlushTime = BACKFLUSH_FLUSH_TIME;
+int backflushOn = 0;
+int backflushState = 10;
+int currBackflushCycles = 0; // number of active flush cycles
 
 // Optocoupler
 unsigned long previousMillisOptocouplerReading = millis();
@@ -276,6 +279,9 @@ SysPara<double> sysParaStandbyModeTime(&standbyModeTime, STANDBY_MODE_TIME_MIN, 
 SysPara<float> sysParaScaleCalibration(&scaleCalibration, -100000, 100000, STO_ITEM_SCALE_CALIBRATION_FACTOR);
 SysPara<float> sysParaScale2Calibration(&scale2Calibration, -100000, 100000, STO_ITEM_SCALE2_CALIBRATION_FACTOR);
 SysPara<float> sysParaScaleKnownWeight(&scaleKnownWeight, 0, 2000, STO_ITEM_SCALE_KNOWN_WEIGHT);
+SysPara<int> sysParaBackflushCycles(&backflushCycles, BACKFLUSH_CYCLES_MIN, BACKFLUSH_CYCLES_MAX, STO_ITEM_BACKFLUSH_CYCLES);
+SysPara<double> sysParaBackflushFillTime(&backflushFillTime, BACKFLUSH_FILL_TIME_MIN, BACKFLUSH_FILL_TIME_MAX, STO_ITEM_BACKFLUSH_FILL_TIME);
+SysPara<double> sysParaBackflushFlushTime(&backflushFlushTime, BACKFLUSH_FLUSH_TIME_MIN, BACKFLUSH_FLUSH_TIME_MAX, STO_ITEM_BACKFLUSH_FLUSH_TIME);
 
 // Other variables
 boolean emergencyStop = false;                // Emergency stop if temperature is too high
@@ -283,10 +289,6 @@ const double EmergencyStopTemp = 145;         // Temp EmergencyStopTemp
 float inX = 0, inY = 0, inOld = 0, inSum = 0; // used for filterPressureValue()
 boolean brewDetected = 0;
 boolean setupDone = false;
-int backflushOn = 0;                          // 1 = backflush mode active
-int flushCycles = 0;                          // number of active flush cycles
-
-int backflushState = 10;
 
 // Water sensor
 boolean waterFull = true;
@@ -1347,12 +1349,45 @@ void setup() {
                                         .maxValue = PRE_INFUSION_TIME_MAX,
                                         .ptr = (void*)&preinfusion};
 
+    editableVars["BACKFLUSH_CYCLES"] = {.displayName = F("Backflush Cycles"),
+                                        .hasHelpText = true,
+                                        .helpText = "Number of cycles of filling and flushing during a backflush",
+                                        .type = kInteger,
+                                        .section = sBrewSection,
+                                        .position = 17,
+                                        .show = [] { return true && FEATURE_BREWCONTROL == 1; },
+                                        .minValue = BACKFLUSH_CYCLES_MIN,
+                                        .maxValue = BACKFLUSH_CYCLES_MAX,
+                                        .ptr = (void*)&backflushCycles};
+
+    editableVars["BACKFLUSH_FILL_TIME"] = {.displayName = F("Backflush Fill Time (s)"),
+                                           .hasHelpText = true,
+                                           .helpText = "Time in seconds the pump is running during one backflush cycle",
+                                           .type = kDouble,
+                                           .section = sBrewSection,
+                                           .position = 18,
+                                           .show = [] { return true && FEATURE_BREWCONTROL == 1; },
+                                           .minValue = BACKFLUSH_FILL_TIME_MIN,
+                                           .maxValue = BACKFLUSH_FILL_TIME_MAX,
+                                           .ptr = (void*)&backflushFillTime};
+
+    editableVars["BACKFLUSH_FLUSH_TIME"] = {.displayName = F("Backflush Flush Time (s)"),
+                                            .hasHelpText = true,
+                                            .helpText = "Time in seconds the selenoid valve stays open during one backflush cycle",
+                                            .type = kDouble,
+                                            .section = sBrewSection,
+                                            .position = 19,
+                                            .show = [] { return true && FEATURE_BREWCONTROL == 1; },
+                                            .minValue = BACKFLUSH_FLUSH_TIME_MIN,
+                                            .maxValue = BACKFLUSH_FLUSH_TIME_MAX,
+                                            .ptr = (void*)&backflushFlushTime};
+
     editableVars["SCALE_WEIGHTSETPOINT"] = {.displayName = F("Brew weight setpoint (g)"),
                                             .hasHelpText = true,
                                             .helpText = F("Brew is running until this weight has been measured. Set to 0 to deactivate brew-by-weight-feature."),
                                             .type = kDouble,
                                             .section = sBrewSection,
-                                            .position = 17,
+                                            .position = 20,
                                             .show = [] { return true && FEATURE_SCALE == 1; },
                                             .minValue = WEIGHTSETPOINT_MIN,
                                             .maxValue = WEIGHTSETPOINT_MAX,
@@ -1366,7 +1401,7 @@ void setup() {
                                                   "Silvia. Set to 0 for thermoblock machines."),
                                     .type = kDouble,
                                     .section = sBDSection,
-                                    .position = 18,
+                                    .position = 21,
                                     .show = [] { return true; },
                                     .minValue = BREW_PID_DELAY_MIN,
                                     .maxValue = BREW_PID_DELAY_MAX,
@@ -1377,7 +1412,7 @@ void setup() {
                                  .helpText = F("Use separate PID parameters while brew is running"),
                                  .type = kUInt8,
                                  .section = sBDSection,
-                                 .position = 19,
+                                 .position = 22,
                                  .show = [] { return true && FEATURE_BREWDETECTION == 1; },
                                  .minValue = 0,
                                  .maxValue = 1,
@@ -1395,7 +1430,7 @@ void setup() {
                                                "#post-1453641' target='_blank'>Details<a>)"),
                                  .type = kDouble,
                                  .section = sBDSection,
-                                 .position = 20,
+                                 .position = 23,
                                  .show = [] { return true && FEATURE_BREWDETECTION == 1 && useBDPID; },
                                  .minValue = PID_KP_BD_MIN,
                                  .maxValue = PID_KP_BD_MAX,
@@ -1407,7 +1442,7 @@ void setup() {
                                                "brewing has been detected."),
                                  .type = kDouble,
                                  .section = sBDSection,
-                                 .position = 21,
+                                 .position = 24,
                                  .show = [] { return true && FEATURE_BREWDETECTION == 1 && useBDPID; },
                                  .minValue = PID_TN_BD_MIN,
                                  .maxValue = PID_TN_BD_MAX,
@@ -1419,7 +1454,7 @@ void setup() {
                                                "when brewing has been detected."),
                                  .type = kDouble,
                                  .section = sBDSection,
-                                 .position = 22,
+                                 .position = 25,
                                  .show = [] { return true && FEATURE_BREWDETECTION == 1 && useBDPID; },
                                  .minValue = PID_TV_BD_MIN,
                                  .maxValue = PID_TV_BD_MAX,
@@ -1431,7 +1466,7 @@ void setup() {
                                                  "enabled (also after Brew switch is inactive again)."),
                                    .type = kDouble,
                                    .section = sBDSection,
-                                   .position = 23,
+                                   .position = 26,
                                    .show = [] { return true && FEATURE_BREWDETECTION == 1 && (useBDPID || BREWDETECTION_TYPE == 1); },
                                    .minValue = BREW_SW_TIME_MIN,
                                    .maxValue = BREW_SW_TIME_MAX,
@@ -1445,24 +1480,24 @@ void setup() {
                                                         "Needs to be &gt;0 also for Hardware switch detection."),
                                           .type = kDouble,
                                           .section = sBDSection,
-                                          .position = 24,
+                                          .position = 27,
                                           .show = [] { return true && BREWDETECTION_TYPE == 1; },
                                           .minValue = BD_THRESHOLD_MIN,
                                           .maxValue = BD_THRESHOLD_MAX,
                                           .ptr = (void*)&brewSensitivity};
 
     editableVars["STEAM_MODE"] = {
-        .displayName = F("Steam Mode"), .hasHelpText = false, .helpText = "", .type = kUInt8, .section = sOtherSection, .position = 25, .show = [] { return false; }, .minValue = 0, .maxValue = 1, .ptr = (void*)&steamON};
+        .displayName = F("Steam Mode"), .hasHelpText = false, .helpText = "", .type = kUInt8, .section = sOtherSection, .position = 28, .show = [] { return false; }, .minValue = 0, .maxValue = 1, .ptr = (void*)&steamON};
 
     editableVars["BACKFLUSH_ON"] = {
-        .displayName = F("Backflush"), .hasHelpText = false, .helpText = "", .type = kUInt8, .section = sOtherSection, .position = 26, .show = [] { return false; }, .minValue = 0, .maxValue = 1, .ptr = (void*)&backflushOn};
+        .displayName = F("Backflush"), .hasHelpText = false, .helpText = "", .type = kUInt8, .section = sOtherSection, .position = 29, .show = [] { return false; }, .minValue = 0, .maxValue = 1, .ptr = (void*)&backflushOn};
 
     editableVars["STANDBY_MODE_ON"] = {.displayName = F("Enable Standby Timer"),
                                        .hasHelpText = true,
                                        .helpText = F("Turn heater off after standby time has elapsed."),
                                        .type = kUInt8,
                                        .section = sPowerSection,
-                                       .position = 27,
+                                       .position = 30,
                                        .show = [] { return true; },
                                        .minValue = 0,
                                        .maxValue = 1,
@@ -1473,7 +1508,7 @@ void setup() {
                                           .helpText = F("Time in minutes until the heater is turned off. Timer is reset by brew detection."),
                                           .type = kDouble,
                                           .section = sPowerSection,
-                                          .position = 28,
+                                          .position = 31,
                                           .show = [] { return true; },
                                           .minValue = STANDBY_MODE_TIME_MIN,
                                           .maxValue = STANDBY_MODE_TIME_MAX,
@@ -1488,7 +1523,7 @@ void setup() {
                                       .helpText = "",
                                       .type = kUInt8,
                                       .section = sScaleSection,
-                                      .position = 30,
+                                      .position = 33,
                                       .show = [] { return false; },
                                       .minValue = 0,
                                       .maxValue = 1,
@@ -1499,7 +1534,7 @@ void setup() {
                                           .helpText = "",
                                           .type = kFloat,
                                           .section = sScaleSection,
-                                          .position = 31,
+                                          .position = 34,
                                           .show = [] { return true; },
                                           .minValue = 0,
                                           .maxValue = 2000,
@@ -1510,7 +1545,7 @@ void setup() {
                                          .helpText = "",
                                          .type = kFloat,
                                          .section = sScaleSection,
-                                         .position = 32,
+                                         .position = 35,
                                          .show = [] { return true; },
                                          .minValue = -100000,
                                          .maxValue = 100000,
@@ -1521,7 +1556,7 @@ void setup() {
                                           .helpText = "",
                                           .type = kFloat,
                                           .section = sScaleSection,
-                                          .position = 32,
+                                          .position = 36,
                                           .show = [] { return SCALE_TYPE == 0; },
                                           .minValue = -100000,
                                           .maxValue = 100000,
@@ -1555,9 +1590,10 @@ void setup() {
     mqttVars["standbyModeOn"] = [] { return &editableVars.at("STANDBY_MODE_ON"); };
 
     if (FEATURE_BREWCONTROL == 1) {
-        mqttVars["brewtime"] = [] { return &editableVars.at("BREW_TIME"); };
-        mqttVars["preinfusionpause"] = [] { return &editableVars.at("BREW_PREINFUSIONPAUSE"); };
-        mqttVars["preinfusion"] = [] { return &editableVars.at("BREW_PREINFUSION"); };
+        mqttVars["preinfusionPause"] = [] { return &editableVars.at("BREW_PREINFUSIONPAUSE"); };
+        mqttVars["backflushCycles"] = [] { return &editableVars.at("BACKFLUSH_CYCLES"); };
+        mqttVars["backflushFillTime"] = [] { return &editableVars.at("BACKFLUSH_FILL_TIME"); };
+        mqttVars["backflushFlushTime"] = [] { return &editableVars.at("BACKFLUSH_FLUSH_TIME"); };
     }
 
     if (FEATURE_SCALE == 1) {
@@ -2109,7 +2145,9 @@ int readSysParamsFromStorage(void) {
     if (sysParaScaleCalibration.getStorage() != 0) return -1;
     if (sysParaScale2Calibration.getStorage() != 0) return -1;
     if (sysParaScaleKnownWeight.getStorage() != 0) return -1;
-
+    if (sysParaBackflushCycles.setStorage() != 0) return -1;
+    if (sysParaBackflushFillTime.setStorage() != 0) return -1;
+    if (sysParaBackflushFlushTime.setStorage() != 0) return -1;
     return 0;
 }
 
@@ -2148,7 +2186,10 @@ int writeSysParamsToStorage(void) {
     if (sysParaScaleCalibration.setStorage() != 0) return -1;
     if (sysParaScale2Calibration.setStorage() != 0) return -1;
     if (sysParaScaleKnownWeight.setStorage() != 0) return -1;
-
+    if (sysParaBackflushCycles.getStorage() != 0) return -1;
+    if (sysParaBackflushFillTime.getStorage() != 0) return -1;
+    if (sysParaBackflushFlushTime.getStorage() != 0) return -1;
+    
     return storageCommit();
 }
 
