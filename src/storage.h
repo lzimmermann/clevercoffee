@@ -112,7 +112,7 @@ typedef struct __attribute__((packed)) {
         double steamSetpoint;
         uint8_t standbyModeOn;
         double standbyModeTime;
-         int backflushCycles;
+        int backflushCycles;
         double backflushFillTimeMs;
         double backflushFlushTimeMs;
 
@@ -165,7 +165,7 @@ static const sto_data_t itemDefaults PROGMEM = {
     STANDBY_MODE_TIME,                                                                                                              // STO_ITEM_STANDBY_MODE_TIME
     BACKFLUSH_CYCLES,                                                                                                               // STO_ITEM_BACKFLUSH_CYCLES
     BACKFLUSH_FILL_TIME,                                                                                                            // STO_ITEM_BACKFLUSH_FILLTIME
-    BACKFLUSH_FLUSH_TIME,                                                                                                           // STO_ITEM_BACKFLUSH_FLUSHTIME                                                                                                               
+    BACKFLUSH_FLUSH_TIME,                                                                                                           // STO_ITEM_BACKFLUSH_FLUSHTIME
     // STO_ITEM_STANDBY_MODE_TIME
 };
 
@@ -343,7 +343,7 @@ static inline int32_t getItemAddr(sto_item_id_t itemId, uint16_t* maxItemSize = 
             addr = offsetof(sto_data_t, scaleKnownWeight);
             size = STRUCT_MEMBER_SIZE(sto_data_t, scaleKnownWeight);
             break;
-                case STO_ITEM_BACKFLUSH_CYCLES:
+        case STO_ITEM_BACKFLUSH_CYCLES:
             addr = offsetof(sto_data_t, backflushCycles);
             size = STRUCT_MEMBER_SIZE(sto_data_t, backflushCycles);
             break;

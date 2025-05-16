@@ -85,7 +85,7 @@ enum MachineState {
     kBrewDetectionTrailing = 35,
     kSteam = 40,
     kBackflush = 50,
-    kWaterEmpty = 70,
+    kWaterTankEmpty = 70,
     kEmergencyStop = 80,
     kPidDisabled = 90,
     kStandby = 95,
@@ -151,7 +151,7 @@ const unsigned long intervalPressure = 100;
 unsigned long previousMillisPressure; // initialisation at the end of init()
 #endif
 
-Switch* waterSensor;
+Switch* waterTankSensor;
 
 GPIOPin* statusLedPin;
 GPIOPin* brewLedPin;
@@ -191,7 +191,7 @@ void setBDPIDTunings();
 void loopcalibrate();
 void looppid();
 void loopLED();
-void checkWater();
+void checkWaterTank();
 void printMachineState();
 char const* machinestateEnumToString(MachineState machineState);
 void initSteamQM();
@@ -204,6 +204,7 @@ float filterPressureValue(float input);
 int writeSysParamsToMQTT(bool continueOnError);
 void updateStandbyTimer(void);
 void resetStandbyTimer(void);
+void wiFiReset(void);
 
 // system parameters
 uint8_t pidON = 0; // 1 = control loop in closed loop
@@ -290,11 +291,11 @@ float inX = 0, inY = 0, inOld = 0, inSum = 0; // used for filterPressureValue()
 boolean brewDetected = 0;
 boolean setupDone = false;
 
-// Water sensor
-boolean waterFull = true;
-Timer loopWater(&checkWater, 200);  // Check water level every 200 ms
-int waterCheckConsecutiveReads = 0; // Counter for consecutive readings of water sensor
-const int waterCountsNeeded = 3;    // Number of same readings to change water sensing
+// Water tank sensor
+boolean waterTankFull = true;
+Timer loopWaterTank(&checkWaterTank, 200); // Check water tank level every 200 ms
+int waterTankCheckConsecutiveReads = 0;    // Counter for consecutive readings of water tank sensor
+const int waterTankCountsNeeded = 3;       // Number of same readings to change water tank sensing
 
 // Moving average for software brew detection
 unsigned long timeBrewDetection = 0;
@@ -715,8 +716,8 @@ boolean checkSteamOffQM() {
 void handleMachineState() {
     switch (machineState) {
         case kInit:
-            if (!waterFull) {
-                machineState = kWaterEmpty;
+            if (!waterTankFull) {
+                machineState = kWaterTankEmpty;
             }
 
             if (tempSensor->hasError()) {
@@ -772,8 +773,8 @@ void handleMachineState() {
                 machineState = kPidDisabled;
             }
 
-            if (!waterFull) {
-                machineState = kWaterEmpty;
+            if (!waterTankFull) {
+                machineState = kWaterTankEmpty;
             }
 
             if (tempSensor->hasError()) {
@@ -843,8 +844,8 @@ void handleMachineState() {
                 machineState = kPidDisabled;
             }
 
-            if (!waterFull) {
-                machineState = kWaterEmpty;
+            if (!waterTankFull) {
+                machineState = kWaterTankEmpty;
             }
 
             if (tempSensor->hasError()) {
@@ -880,8 +881,8 @@ void handleMachineState() {
                 machineState = kPidDisabled;
             }
 
-            if (!waterFull) {
-                machineState = kWaterEmpty;
+            if (!waterTankFull) {
+                machineState = kWaterTankEmpty;
             }
 
             if (tempSensor->hasError()) {
@@ -906,8 +907,8 @@ void handleMachineState() {
                 machineState = kPidDisabled;
             }
 
-            if (!waterFull) {
-                machineState = kWaterEmpty;
+            if (!waterTankFull) {
+                machineState = kWaterTankEmpty;
             }
 
             if (tempSensor->hasError()) {
@@ -928,8 +929,8 @@ void handleMachineState() {
                 machineState = kPidDisabled;
             }
 
-            if (!waterFull && (backflushState == kBackflushWaitBrewswitchOn || backflushState == kBackflushWaitBrewswitchOff)) {
-                machineState = kWaterEmpty;
+            if (!waterTankFull && (backflushState == kBackflushWaitBrewswitchOn || backflushState == kBackflushWaitBrewswitchOff)) {
+                machineState = kWaterTankEmpty;
             }
 
             if (tempSensor->hasError()) {
@@ -951,9 +952,13 @@ void handleMachineState() {
             }
             break;
 
-        case kWaterEmpty:
-            if (waterFull) {
+        case kWaterTankEmpty:
+            if (waterTankFull) {
                 machineState = kPidNormal;
+
+                if (standbyModeOn) {
+                    resetStandbyTimer();
+                }
             }
 
             if (pidON == 0) {
@@ -971,8 +976,8 @@ void handleMachineState() {
                 machineState = kPidNormal;
             }
 
-            if (!waterFull) {
-                machineState = kWaterEmpty;
+            if (!waterTankFull) {
+                machineState = kWaterTankEmpty;
             }
 
             if (tempSensor->hasError()) {
@@ -1048,8 +1053,8 @@ char const* machinestateEnumToString(MachineState machineState) {
             return "Steam";
         case kBackflush:
             return "Backflush";
-        case kWaterEmpty:
-            return "Water Empty";
+        case kWaterTankEmpty:
+            return "Water Tank Empty";
         case kEmergencyStop:
             return "Emergency Stop";
         case kPidDisabled:
@@ -1121,6 +1126,11 @@ void wiFiSetup() {
 #if OLED_DISPLAY != 0
     displayLogo(langstring_connectwifi1, wm.getWiFiSSID(true));
 #endif
+}
+
+void wiFiReset() {
+    wm.resetSettings();
+    ESP.restart();
 }
 
 /**
@@ -1516,7 +1526,7 @@ void setup() {
 
 #if FEATURE_SCALE == 1
     editableVars["TARE_ON"] = {
-        .displayName = F("Tare"), .hasHelpText = false, .helpText = "", .type = kUInt8, .section = sScaleSection, .position = 29, .show = [] { return false; }, .minValue = 0, .maxValue = 1, .ptr = (void*)&scaleTareOn};
+        .displayName = F("Tare"), .hasHelpText = false, .helpText = "", .type = kUInt8, .section = sScaleSection, .position = 32, .show = [] { return false; }, .minValue = 0, .maxValue = 1, .ptr = (void*)&scaleTareOn};
 
     editableVars["CALIBRATION_ON"] = {.displayName = F("Calibration"),
                                       .hasHelpText = false,
@@ -1590,6 +1600,8 @@ void setup() {
     mqttVars["standbyModeOn"] = [] { return &editableVars.at("STANDBY_MODE_ON"); };
 
     if (FEATURE_BREWCONTROL == 1) {
+        mqttVars["brewtime"] = [] { return &editableVars.at("BREW_TIME"); };
+        mqttVars["preinfusion"] = [] { return &editableVars.at("BREW_PREINFUSION"); };
         mqttVars["preinfusionPause"] = [] { return &editableVars.at("BREW_PREINFUSIONPAUSE"); };
         mqttVars["backflushCycles"] = [] { return &editableVars.at("BACKFLUSH_CYCLES"); };
         mqttVars["backflushFillTime"] = [] { return &editableVars.at("BACKFLUSH_FILL_TIME"); };
@@ -1686,8 +1698,8 @@ void setup() {
         // TODO Addressable LEDs
     }
 
-    if (FEATURE_WATER_SENS == 1) {
-        waterSensor = new IOSwitch(PIN_WATERSENSOR, (WATER_SENS_TYPE == Switch::NORMALLY_OPEN ? GPIOPin::IN_PULLDOWN : GPIOPin::IN_PULLUP), Switch::TOGGLE, WATER_SENS_TYPE);
+    if (FEATURE_WATERTANKSENSOR == 1) {
+        waterTankSensor = new IOSwitch(PIN_WATERTANKSENSOR, (WATERTANKSENSOR_TYPE == Switch::NORMALLY_OPEN ? GPIOPin::IN_PULLDOWN : GPIOPin::IN_PULLUP), Switch::TOGGLE, WATERTANKSENSOR_TYPE);
     }
 
 #if OLED_DISPLAY != 0
@@ -1797,8 +1809,8 @@ void loop() {
     // Accept potential connections for remote logging
     Logger::update();
 
-    // Update water sensor
-    loopWater();
+    // Update water tank sensor
+    loopWaterTank();
 
     // Update PID settings & machine state
     looppid();
@@ -1926,7 +1938,7 @@ void looppid() {
     printDisplayTimer();
 #endif
 
-    if (machineState == kPidDisabled || machineState == kWaterEmpty || machineState == kSensorError || machineState == kEmergencyStop || machineState == kEepromError || machineState == kStandby || brewPIDDisabled) {
+    if (machineState == kPidDisabled || machineState == kWaterTankEmpty || machineState == kSensorError || machineState == kEmergencyStop || machineState == kEepromError || machineState == kStandby || brewPIDDisabled) {
         if (bPID.GetMode() == 1) {
             // Force PID shutdown
             bPID.SetMode(0);
@@ -2021,20 +2033,20 @@ void loopLED() {
     }
 }
 
-void checkWater() {
-    if (FEATURE_WATER_SENS != 1) {
+void checkWaterTank() {
+    if (FEATURE_WATERTANKSENSOR != 1) {
         return;
     }
 
-    bool isWaterDetected = waterSensor->isPressed();
+    bool isWaterDetected = waterTankSensor->isPressed();
 
-    if (isWaterDetected && !waterFull) {
-        waterFull = true;
-        LOG(INFO, "Water full");
+    if (isWaterDetected && !waterTankFull) {
+        waterTankFull = true;
+        LOG(INFO, "Water tank full");
     }
-    else if (!isWaterDetected && waterFull) {
-        waterFull = false;
-        LOG(WARNING, "Water empty");
+    else if (!isWaterDetected && waterTankFull) {
+        waterTankFull = false;
+        LOG(WARNING, "Water tank empty");
     }
 }
 
@@ -2145,9 +2157,10 @@ int readSysParamsFromStorage(void) {
     if (sysParaScaleCalibration.getStorage() != 0) return -1;
     if (sysParaScale2Calibration.getStorage() != 0) return -1;
     if (sysParaScaleKnownWeight.getStorage() != 0) return -1;
-    if (sysParaBackflushCycles.setStorage() != 0) return -1;
-    if (sysParaBackflushFillTime.setStorage() != 0) return -1;
-    if (sysParaBackflushFlushTime.setStorage() != 0) return -1;
+    if (sysParaBackflushCycles.getStorage() != 0) return -1;
+    if (sysParaBackflushFillTime.getStorage() != 0) return -1;
+    if (sysParaBackflushFlushTime.getStorage() != 0) return -1;
+
     return 0;
 }
 
@@ -2186,10 +2199,10 @@ int writeSysParamsToStorage(void) {
     if (sysParaScaleCalibration.setStorage() != 0) return -1;
     if (sysParaScale2Calibration.setStorage() != 0) return -1;
     if (sysParaScaleKnownWeight.setStorage() != 0) return -1;
-    if (sysParaBackflushCycles.getStorage() != 0) return -1;
-    if (sysParaBackflushFillTime.getStorage() != 0) return -1;
-    if (sysParaBackflushFlushTime.getStorage() != 0) return -1;
-    
+    if (sysParaBackflushCycles.setStorage() != 0) return -1;
+    if (sysParaBackflushFillTime.setStorage() != 0) return -1;
+    if (sysParaBackflushFlushTime.setStorage() != 0) return -1;
+
     return storageCommit();
 }
 
