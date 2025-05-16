@@ -78,6 +78,10 @@ enum MACHINE {
 #define SCALE_TYPE    0 // 0 = one HX711 per load cell, 1 = Only a single HX711 with two channels
 #define SCALE_SAMPLES 2 // Load cell sample rate
 
+#define STANDBY_TIMER_START_HOUR 18  // Start hour for standby timer (24h format)
+#define STANDBY_TIMER_END_HOUR    6 // End hour for standby timer (24h format)
+
+
 // PlatformIO OTA
 #define OTA     true      // true = OTA activated, false = OTA deactivated
 #define OTAPASS "otapass" // Password for OTA updates
