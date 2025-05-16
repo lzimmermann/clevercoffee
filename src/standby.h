@@ -26,19 +26,15 @@ void updateStandbyTimer(void) {
     struct tm* t = localtime(&now);
     int hour = t->tm_hour;
 
-    bool insideWindow;
-    if (STANDBY_TIMER_START_HOUR <= STANDBY_TIMER_END_HOUR) {
-        insideWindow = (hour >= STANDBY_TIMER_START_HOUR && hour < STANDBY_TIMER_END_HOUR);
-    } else {
-        insideWindow = (hour >= STANDBY_TIMER_START_HOUR || hour < STANDBY_TIMER_END_HOUR);
-    }
-    if (!insideWindow) {
-        // wenn Ende-Stunde erreicht, Timer zurücksetzen
-        resetStandbyTimer();
-        return;
-    }
 
     unsigned long currentTime = millis();
+    if (hour == STANDBY_TIMER_END_HOUR) {
+         if ((currentTime % 60000) == 0) {
+
+            resetStandbyTimer();
+            return;
+         }
+    }
 
     if ((standbyModeRemainingTimeMillis != 0) && ((currentTime % 1000) == 0) && (currentTime != lastStandbyTimeMillis)) {
         unsigned long standbyModeTimeMillis = standbyModeTime * 60 * 1000;
