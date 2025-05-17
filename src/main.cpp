@@ -243,6 +243,8 @@ double brewPIDDelay = BREW_PID_DELAY;    // use userConfig brew detection PID de
 
 uint8_t standbyModeOn = 0;
 double standbyModeTime = STANDBY_MODE_TIME;
+uint8_t standbyTimerStartHour = STANDBY_TIMER_START_HOUR;
+uint8_t standbyTimerEndHour = STANDBY_TIMER_END_HOUR;
 
 #include "standby.h"
 
@@ -1508,6 +1510,40 @@ void setup() {
                                           .minValue = STANDBY_MODE_TIME_MIN,
                                           .maxValue = STANDBY_MODE_TIME_MAX,
                                           .ptr = (void*)&standbyModeTime};
+
+
+    // neu: Start-Stunde für Standby-Timer (0–23)
+    editableVars["STANDBY_TIMER_START_HOUR"] = {
+        .displayName = F("Standby Start Hour"),
+        .hasHelpText  = true,
+        .helpText     = F("Hour (0–23) at which Standby-Timer beginnt."),
+        .type         = kInteger,
+        .section      = sPowerSection,
+        .position     = 32,
+        .show         = [] { return true; },
+        .minValue     = 0,
+        .maxValue     = 23,
+        .ptr          = (void*)&standbyTimerStartHour
+    };
+
+    // neu: End-Stunde für Standby-Timer (0–23)
+    editableVars["STANDBY_TIMER_END_HOUR"] = {
+        .displayName = F("Standby End Hour"),
+        .hasHelpText  = true,
+        .helpText     = F("Hour (0–23) at which Standby-Timer endet."),
+        .type         = kInteger,
+        .section      = sPowerSection,
+        .position     = 33,
+        .show         = [] { return true; },
+        .minValue     = 0,
+        .maxValue     = 23,
+        .ptr          = (void*)&standbyTimerEndHour
+    };
+
+
+
+
+
 
 #if FEATURE_SCALE == 1
     editableVars["TARE_ON"] = {
