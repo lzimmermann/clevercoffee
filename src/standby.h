@@ -39,13 +39,9 @@ void updateStandbyTimer(void) {
         insideStandbyTime = (hour >= STANDBY_TIMER_START_HOUR || hour < STANDBY_TIMER_END_HOUR);
     }
     if (!insideStandbyTime) {
+        LOGF(INFO, "Standby time Not in Standby hours");
         return;
     }
-
-    unsigned long currentTime = millis();
-
-
-
 
 
     if ((standbyModeRemainingTimeMillis != 0) && ((currentTime % 1000) == 0) && (currentTime != lastStandbyTimeMillis)) {
