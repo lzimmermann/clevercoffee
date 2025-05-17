@@ -46,6 +46,8 @@ int writeSysParamsToStorage(void);
 #define WIFI_CREDENTIALS_SAVED    0      // Flag if wifi setup is done. 0: not set up, 1: credentials set up via wifi manager
 #define STANDBY_MODE_ON           0      // Standby mode off by default
 #define STANDBY_MODE_TIME         30     // Time in minutes until the heater is turned off
+#define STANDBY_TIMER_START_HOUR  18     // Start hour of standby timer
+#define STANDBY_TIMER_END_HOUR    6      // End hour of standby timer
 #define BACKFLUSH_CYCLES          5      // number of cycles the backflush should run
 #define BACKFLUSH_FILL_TIME       5      // time in seconds the pump is running during backflush
 #define BACKFLUSH_FLUSH_TIME      10     // time in seconds the 3-way valve is open during backflush

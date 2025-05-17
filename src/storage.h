@@ -38,6 +38,8 @@ typedef enum {
     STO_ITEM_WEIGHTSETPOINT,            // Brew weight setpoint
     STO_ITEM_STANDBY_MODE_ON,           // Enable tandby mode
     STO_ITEM_STANDBY_MODE_TIME,         // Time until heater is turned off
+    STO_ITEM_STANDBY_TIMER_START_HOUR, // Start hour of standby timer
+    STO_ITEM_STANDBY_TIMER_END_HOUR, // End hour of standby timer
     STO_ITEM_SCALE_CALIBRATION_FACTOR,  // Calibration factor for scale
     STO_ITEM_SCALE2_CALIBRATION_FACTOR, // Calibration factor for scale 2
     STO_ITEM_SCALE_KNOWN_WEIGHT,        // Calibration weight for scale
@@ -113,6 +115,8 @@ typedef struct __attribute__((packed)) {
         double steamSetpoint;
         uint8_t standbyModeOn;
         double standbyModeTime;
+        uint8_t standbyTimerStartHour;
+        uint8_t standbyTimerEndHour;
         int backflushCycles;
         double backflushFillTimeMs;
         double backflushFlushTimeMs;
@@ -328,6 +332,17 @@ static inline int32_t getItemAddr(sto_item_id_t itemId, uint16_t* maxItemSize = 
             addr = offsetof(sto_data_t, standbyModeTime);
             size = STRUCT_MEMBER_SIZE(sto_data_t, standbyModeTime);
             break;
+
+        case STO_ITEM_STANDBY_TIMER_START_HOUR:
+            addr = offsetof(sto_data_t, standbyTimerStartHour);
+            size = STRUCT_MEMBER_SIZE(sto_data_t, standbyTimerStartHour);
+            break;
+
+        case STO_ITEM_STANDBY_TIMER_END_HOUR:
+            addr = offsetof(sto_data_t, standbyTimerEndHour);
+            size = STRUCT_MEMBER_SIZE(sto_data_t, standbyTimerEndHour);
+            break;
+
 
         case STO_ITEM_SCALE_CALIBRATION_FACTOR:
             addr = offsetof(sto_data_t, scaleCalibration);
