@@ -28,11 +28,23 @@ void updateStandbyTimer(void) {
 
   if (hour == STANDBY_TIMER_END_HOUR) {
          if ((currentTime % 60000) == 0) {
-
             resetStandbyTimer();
-            return;
          }
     }
+
+  bool insideStandbyTime;
+    if (STANDBY_TIMER_START_HOUR <= STANDBY_TIMER_END_HOUR) {
+        insideStandbyTime = (hour >= STANDBY_TIMER_START_HOUR && hour < STANDBY_TIMER_END_HOUR);
+    } else {
+        insideStandbyTime = (hour >= STANDBY_TIMER_START_HOUR || hour < STANDBY_TIMER_END_HOUR);
+    }
+    if (!insideStandbyTime) {
+        return;
+    }
+
+    unsigned long currentTime = millis();
+
+
 
 
 
