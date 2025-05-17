@@ -5,6 +5,8 @@
  */
 
 #pragma once
+#include <time.h>
+#include <userConfig.h>
 
 #define TIME_TO_DISPLAY_OFF 10
 
@@ -18,7 +20,21 @@ unsigned long timeSinceStandbyMillis = 0;
  * @brief Decrements the remaining standby time every second, counting down from the configured duration
  */
 void updateStandbyTimer(void) {
+
     unsigned long currentTime = millis();
+ time_t now = time(nullptr);
+    struct tm* t = localtime(&now);
+    int hour = t->tm_hour;
+
+  if (hour == STANDBY_TIMER_END_HOUR) {
+         if ((currentTime % 60000) == 0) {
+
+            resetStandbyTimer();
+            return;
+         }
+    }
+
+
 
     if ((standbyModeRemainingTimeMillis != 0) && ((currentTime % 1000) == 0) && (currentTime != lastStandbyTimeMillis)) {
         unsigned long standbyModeTimeMillis = standbyModeTime * 60 * 1000;
