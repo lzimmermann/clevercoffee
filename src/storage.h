@@ -46,6 +46,7 @@ typedef enum {
     STO_ITEM_BACKFLUSH_CYCLES,          // number of cycles the backflush should run
     STO_ITEM_BACKFLUSH_FILL_TIME,       // time in ms the pump is running during backflush
     STO_ITEM_BACKFLUSH_FLUSH_TIME,      // time in ms the 3-way valve is open during backflush
+
     /* WHEN ADDING NEW ITEMS, THE FOLLOWING HAS TO BE UPDATED:
      * - storage structure:  sto_data_t
      * - item default value: itemDefaults
@@ -166,7 +167,6 @@ static const sto_data_t itemDefaults PROGMEM = {
     BACKFLUSH_CYCLES,                                                                                                               // STO_ITEM_BACKFLUSH_CYCLES
     BACKFLUSH_FILL_TIME,                                                                                                            // STO_ITEM_BACKFLUSH_FILLTIME
     BACKFLUSH_FLUSH_TIME,                                                                                                           // STO_ITEM_BACKFLUSH_FLUSHTIME
-    // STO_ITEM_STANDBY_MODE_TIME
 };
 
 /**
@@ -343,6 +343,7 @@ static inline int32_t getItemAddr(sto_item_id_t itemId, uint16_t* maxItemSize = 
             addr = offsetof(sto_data_t, scaleKnownWeight);
             size = STRUCT_MEMBER_SIZE(sto_data_t, scaleKnownWeight);
             break;
+
         case STO_ITEM_BACKFLUSH_CYCLES:
             addr = offsetof(sto_data_t, backflushCycles);
             size = STRUCT_MEMBER_SIZE(sto_data_t, backflushCycles);

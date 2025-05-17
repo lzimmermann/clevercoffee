@@ -17,8 +17,7 @@
 #define PIN_STEAMSWITCH 35
 #define PIN_WATERSWITCH 36
 
-#define PIN_ADDITIONAL_TEMPSENSOR 4 // Additional temperature sensor
-// #define PIN_ROTARY_DT  4 // Rotary encoder data pin
+#define PIN_ROTARY_DT  4 // Rotary encoder data pin
 #define PIN_ROTARY_CLK 3 // Rotary encoder clock pin
 #define PIN_ROTARY_SW  5 // Rotary encoder switch
 

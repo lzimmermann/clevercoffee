@@ -13,7 +13,7 @@
 #include <os.h>
 
 unsigned long previousMillisMQTT;
-const unsigned long intervalMQTT = MQTT_INTERVAL_MS;
+const unsigned long intervalMQTT = 5000;
 
 WiFiClient net;
 PubSubClient mqtt(net);
@@ -57,9 +57,6 @@ String getMachineName(MACHINE machine) {
 
         case QuickMill:
             return "QuickMill";
-
-        case ECMClassikaII:
-            return "ECMClassikaII";
 
         default:
             return ""; // Handle any unknown or invalid values
@@ -546,7 +543,6 @@ int sendHASSIODiscoveryMsg() {
 #if FEATURE_BREWCONTROL == 1
     DiscoveryObject backflushOn = GenerateSwitchDevice("backflushOn", "Backflush");
 #endif
-    DiscoveryObject backflushOn = GenerateSwitchDevice("backflushOn", "Backflush");
     DiscoveryObject startUsePonM = GenerateSwitchDevice("startUsePonM", "Use PonM");
 
     // Button Devices

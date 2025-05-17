@@ -174,10 +174,6 @@ Switch* steamSwitch;
 
 TempSensor* tempSensor;
 
-#if (FEATURE_SECONDARYTEMPERATURESENSOR == 1)
-TempSensor* tempSensor2;
-#endif
-
 #include "isr.h"
 
 // Method forward declarations
@@ -308,7 +304,7 @@ double setpointTemp;
 double previousInput = 0;
 
 // Variables to hold PID values (Temp input, Heater output)
-double temperature, temperature2, pidOutput;
+double temperature, pidOutput;
 int steamON = 0;
 int steamFirstON = 0;
 
@@ -1146,23 +1142,12 @@ void websiteSetup() {
 
 const char sysVersion[] = (STR(FW_VERSION) "." STR(FW_SUBVERSION) "." STR(FW_HOTFIX) " " FW_BRANCH " " AUTO_VERSION);
 
-#include <WiFi.h>
-
 void setup() {
     // Start serial console
     Serial.begin(115200);
 
     // Initialize the logger
     Logger::init(23);
-
-    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(1000);
-        Serial.println("Verbinde...");
-    }
-
-    Serial.println("Verbunden!");
 
     editableVars["PID_ON"] = {
         .displayName = "Enable PID Controller", .hasHelpText = false, .helpText = "", .type = kUInt8, .section = sPIDSection, .position = 1, .show = [] { return true; }, .minValue = 0, .maxValue = 1, .ptr = (void*)&pidON};
@@ -1639,7 +1624,6 @@ void setup() {
     mqttSensors["currentKi"] = [] { return bPID.GetKi(); };
     mqttSensors["currentKd"] = [] { return bPID.GetKd(); };
     mqttSensors["machineState"] = [] { return machineState; };
-    mqttSensors["lastBrewTime"] = [] { return lastBrewTime; };
 
 #if FEATURE_PRESSURESENSOR == 1
     mqttSensors["pressure"] = [] { return inputPressureFilter; };
@@ -1761,19 +1745,6 @@ void setup() {
     temperature = tempSensor->getCurrentTemperature();
 
     temperature -= brewTempOffset;
-
-// Init Additional Temperature Sensors
-#if (FEATURE_SECONDARYTEMPERATURESENSOR == 1)
-    if (TEMP_SENSOR_2 == 1) {
-        tempSensor2 = new TempSensorDallas(PIN_TEMPSENSOR);
-    }
-    else if (TEMP_SENSOR == 2) {
-        tempSensor2 = new TempSensorTSIC(PIN_TEMPSENSOR);
-    }
-
-    temperature2 = tempSensor2->getCurrentTemperature();
-#endif
-
 
 // Init Scale
 #if FEATURE_SCALE == 1
@@ -1933,7 +1904,7 @@ void looppid() {
 
     handleMachineState();
 
-// Check if PID should run or not. If not, set to manual and force output to zero
+    // Check if PID should run or not. If not, set to manual and force output to zero
 #if OLED_DISPLAY != 0
     printDisplayTimer();
 #endif
