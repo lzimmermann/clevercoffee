@@ -12,6 +12,8 @@
 #define FW_HOTFIX     0
 #define FW_BRANCH     "MASTER"
 
+
+#define EDITABLE_VARS_LEN 33
 // STL includes
 #include <map>
 
@@ -275,6 +277,11 @@ SysPara<double> sysParaSteamSetpoint(&steamSetpoint, STEAM_SETPOINT_MIN, STEAM_S
 SysPara<double> sysParaWeightSetpoint(&weightSetpoint, WEIGHTSETPOINT_MIN, WEIGHTSETPOINT_MAX, STO_ITEM_WEIGHTSETPOINT);
 SysPara<uint8_t> sysParaStandbyModeOn(&standbyModeOn, 0, 1, STO_ITEM_STANDBY_MODE_ON);
 SysPara<double> sysParaStandbyModeTime(&standbyModeTime, STANDBY_MODE_TIME_MIN, STANDBY_MODE_TIME_MAX, STO_ITEM_STANDBY_MODE_TIME);
+
+// neu: SysPara für die Standby-Start/End-Hour
+SysPara<uint8_t> sysParaStandbyTimerStartHour(&standbyTimerStartHour, 0, 23, STO_ITEM_STANDBY_TIMER_START_HOUR);
+SysPara<uint8_t> sysParaStandbyTimerEndHour(&standbyTimerEndHour, 0, 23, STO_ITEM_STANDBY_TIMER_END_HOUR);
+
 SysPara<float> sysParaScaleCalibration(&scaleCalibration, -100000, 100000, STO_ITEM_SCALE_CALIBRATION_FACTOR);
 SysPara<float> sysParaScale2Calibration(&scale2Calibration, -100000, 100000, STO_ITEM_SCALE2_CALIBRATION_FACTOR);
 SysPara<float> sysParaScaleKnownWeight(&scaleKnownWeight, 0, 2000, STO_ITEM_SCALE_KNOWN_WEIGHT);
@@ -1596,7 +1603,6 @@ void setup() {
 
     editableVars["VERSION"] = {
         .displayName = F("Version"), .hasHelpText = false, .helpText = "", .type = kCString, .section = sOtherSection, .position = 33, .show = [] { return false; }, .minValue = 0, .maxValue = 1, .ptr = (void*)sysVersion};
-    // when adding parameters, set EDITABLE_VARS_LEN to max of .position
 
 #if (FEATURE_PRESSURESENSOR == 1)
     Wire.begin();
@@ -2169,6 +2175,11 @@ int readSysParamsFromStorage(void) {
     if (sysParaBackflushFillTime.getStorage() != 0) return -1;
     if (sysParaBackflushFlushTime.getStorage() != 0) return -1;
 
+
+   if (sysParaStandbyTimerStartHour.getStorage() != 0) return -1;
+    if (sysParaStandbyTimerEndHour.getStorage()   != 0) return -1;
+
+
     return 0;
 }
 
@@ -2210,6 +2221,9 @@ int writeSysParamsToStorage(void) {
     if (sysParaBackflushCycles.setStorage() != 0) return -1;
     if (sysParaBackflushFillTime.setStorage() != 0) return -1;
     if (sysParaBackflushFlushTime.setStorage() != 0) return -1;
+
+    if (sysParaStandbyTimerStartHour.setStorage() != 0) return -1;
+    if (sysParaStandbyTimerEndHour.setStorage()   != 0) return -1;
 
     return storageCommit();
 }
