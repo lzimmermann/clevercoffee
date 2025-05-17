@@ -168,6 +168,8 @@ static const sto_data_t itemDefaults PROGMEM = {
     STEAMSETPOINT,                                                                                                                  // STO_ITEM_STEAM_SETPOINT
     STANDBY_MODE_ON,                                                                                                                // STO_ITEM_STANDBY_MODE_ON
     STANDBY_MODE_TIME,                                                                                                              // STO_ITEM_STANDBY_MODE_TIME
+    STANDBY_TIMER_START_HOUR,                                                                                                   // STO_ITEM_STANDBY_TIMER_START_HOUR
+    STANDBY_TIMER_END_HOUR,                                                                                                        // STO_ITEM_STANDBY_TIMER_END_HOUR
     BACKFLUSH_CYCLES,                                                                                                               // STO_ITEM_BACKFLUSH_CYCLES
     BACKFLUSH_FILL_TIME,                                                                                                            // STO_ITEM_BACKFLUSH_FILLTIME
     BACKFLUSH_FLUSH_TIME,                                                                                                           // STO_ITEM_BACKFLUSH_FLUSHTIME

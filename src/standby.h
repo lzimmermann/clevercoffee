@@ -27,7 +27,7 @@ void updateStandbyTimer(void) {
     int hour = t->tm_hour;
 
   if (hour == STANDBY_TIMER_END_HOUR) {
-         if ((currentTime % 60000) == 0) {
+         if ((currentTime % 600000) == 0) {
             resetStandbyTimer();
          }
     }
@@ -39,7 +39,9 @@ void updateStandbyTimer(void) {
         insideStandbyTime = (hour >= STANDBY_TIMER_START_HOUR || hour < STANDBY_TIMER_END_HOUR);
     }
     if (!insideStandbyTime) {
-        LOGF(INFO, "Standby time Not in Standby hours");
+
+        LOGF(INFO, "Standby time %i not in Standby hours STANDBY_TIMER_START_HOUR:%i STANDBY_TIMER_END_HOUR:%i",currentTime, STANDBY_TIMER_START_HOUR, STANDBY_TIMER_END_HOUR);
+
         return;
     }
 

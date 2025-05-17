@@ -13,7 +13,6 @@
 #define FW_BRANCH     "MASTER"
 
 
-#define EDITABLE_VARS_LEN 33
 // STL includes
 #include <map>
 
@@ -1836,6 +1835,20 @@ void loop() {
 void looppid() {
     // Only do Wifi stuff, if Wifi is connected
     if (WiFi.status() == WL_CONNECTED && offlineMode == 0) {
+
+        configTime(0, 0, "pool.ntp.org", "time.nist.gov");
+        setenv("TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 1);
+        tzset();
+    };
+
+    struct tm timeinfo;
+    if (!getLocalTime(&timeinfo)) {
+        LOG(WARNING, "Keine Zeit von NTP erhalten");
+    };
+
+
+
+    if (mqtt.connected() == 1) {
         if (FEATURE_MQTT == 1) {
             checkMQTT();
             writeSysParamsToMQTT(true); // Continue on error
