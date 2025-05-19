@@ -12,7 +12,6 @@
 #define FW_HOTFIX     0
 #define FW_BRANCH     "MASTER"
 
-
 // STL includes
 #include <map>
 
@@ -1113,7 +1112,6 @@ void wiFiSetup() {
         String macaddr5 = number2string(mac[5]);
         String completemac = macaddr0 + macaddr1 + macaddr2 + macaddr3 + macaddr4 + macaddr5;
         LOGF(DEBUG, "MAC-ADDRESS: %s", completemac.c_str());
-
     }
     else {
         LOG(INFO, "WiFi connection timed out...");
@@ -1603,6 +1601,7 @@ void setup() {
 
     editableVars["VERSION"] = {
         .displayName = F("Version"), .hasHelpText = false, .helpText = "", .type = kCString, .section = sOtherSection, .position = 33, .show = [] { return false; }, .minValue = 0, .maxValue = 1, .ptr = (void*)sysVersion};
+    // when adding parameters, set EDITABLE_VARS_LEN to max of .position
 
 #if (FEATURE_PRESSURESENSOR == 1)
     Wire.begin();
@@ -1839,12 +1838,6 @@ void loop() {
 void looppid() {
     // Only do Wifi stuff, if Wifi is connected
     if (WiFi.status() == WL_CONNECTED && offlineMode == 0) {
-
-        setenv("TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 1);
-        tzset();
-    };
-
-      if (mqtt.connected() == 1) {
         if (FEATURE_MQTT == 1) {
             checkMQTT();
             writeSysParamsToMQTT(true); // Continue on error
@@ -1881,9 +1874,6 @@ void looppid() {
     else {
         checkWifi();
     }
-
-
-
 
     // Update the temperature:
     temperature = tempSensor->getCurrentTemperature();
