@@ -1523,7 +1523,7 @@ void setup() {
     editableVars["STANDBY_TIMER_START_HOUR"] = {
         .displayName = F("Standby Start Hour"),
         .hasHelpText  = true,
-        .helpText     = F("Hour (0–23) at which Standby-Timer beginnt."),
+        .helpText     = F("Hour (0–23) at which Standby-Timer starts."),
         .type         = kInteger,
         .section      = sPowerSection,
         .position     = 32,
@@ -1537,7 +1537,7 @@ void setup() {
     editableVars["STANDBY_TIMER_END_HOUR"] = {
         .displayName = F("Standby End Hour"),
         .hasHelpText  = true,
-        .helpText     = F("Hour (0–23) at which Standby-Timer endet."),
+        .helpText     = F("Hour (0–23) at which Standby-Timer ends."),
         .type         = kInteger,
         .section      = sPowerSection,
         .position     = 33,
@@ -1842,14 +1842,7 @@ void looppid() {
         tzset();
     };
 
-    // struct tm timeinfo;
-    // if (!getLocalTime(&timeinfo)) {
-    //     LOG(WARNING, "Keine Zeit von NTP erhalten");
-    // };
-
-
-
-    if (mqtt.connected() == 1) {
+      if (mqtt.connected() == 1) {
         if (FEATURE_MQTT == 1) {
             checkMQTT();
             writeSysParamsToMQTT(true); // Continue on error
