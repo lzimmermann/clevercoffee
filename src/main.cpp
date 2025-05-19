@@ -1741,14 +1741,16 @@ void setup() {
     if (connectmode == 1) { // WiFi Mode
         wiFiSetup();
         websiteSetup();
-        configTime(0, 0, "pool.ntp.org", "time.nist.gov");
 
         // OTA Updates
         if (ota && WiFi.status() == WL_CONNECTED) {
             ArduinoOTA.setHostname(hostname); //  Device name for OTA
             ArduinoOTA.setPassword(OTApass);  //  Password for OTA
             ArduinoOTA.begin();
+            LOG(INFO, "OTA started");
         }
+        // configTime(0, 0, "pool.ntp.org", "time.nist.gov");
+        //LOG(INFO, "NTP started");
 
         if (FEATURE_MQTT == 1) {
             snprintf(topic_will, sizeof(topic_will), "%s%s/%s", mqtt_topic_prefix, hostname, "status");
