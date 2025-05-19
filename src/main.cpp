@@ -1748,10 +1748,10 @@ void setup() {
             ArduinoOTA.begin();
             LOG(INFO, "OTA started");
         }
-        // configTime(0, 0, "pool.ntp.org", "time.nist.gov");
-        // setenv("TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 1);
-        // tzset();
-        //LOG(INFO, "NTP started");
+        configTime(0, 0, "pool.ntp.org", "time.nist.gov");
+        setenv("TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 1);
+        tzset();
+        LOG(INFO, "NTP started");
 
         if (FEATURE_MQTT == 1) {
             snprintf(topic_will, sizeof(topic_will), "%s%s/%s", mqtt_topic_prefix, hostname, "status");
