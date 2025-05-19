@@ -1749,6 +1749,8 @@ void setup() {
             LOG(INFO, "OTA started");
         }
         // configTime(0, 0, "pool.ntp.org", "time.nist.gov");
+        // setenv("TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 1);
+        // tzset();
         //LOG(INFO, "NTP started");
 
         if (FEATURE_MQTT == 1) {
