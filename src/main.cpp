@@ -1113,6 +1113,7 @@ void wiFiSetup() {
         String macaddr5 = number2string(mac[5]);
         String completemac = macaddr0 + macaddr1 + macaddr2 + macaddr3 + macaddr4 + macaddr5;
         LOGF(DEBUG, "MAC-ADDRESS: %s", completemac.c_str());
+
     }
     else {
         LOG(INFO, "WiFi connection timed out...");
@@ -1740,6 +1741,7 @@ void setup() {
     if (connectmode == 1) { // WiFi Mode
         wiFiSetup();
         websiteSetup();
+        configTime(0, 0, "pool.ntp.org", "time.nist.gov");
 
         // OTA Updates
         if (ota && WiFi.status() == WL_CONNECTED) {
@@ -1836,15 +1838,14 @@ void looppid() {
     // Only do Wifi stuff, if Wifi is connected
     if (WiFi.status() == WL_CONNECTED && offlineMode == 0) {
 
-        configTime(0, 0, "pool.ntp.org", "time.nist.gov");
         setenv("TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 1);
         tzset();
     };
 
-    struct tm timeinfo;
-    if (!getLocalTime(&timeinfo)) {
-        LOG(WARNING, "Keine Zeit von NTP erhalten");
-    };
+    // struct tm timeinfo;
+    // if (!getLocalTime(&timeinfo)) {
+    //     LOG(WARNING, "Keine Zeit von NTP erhalten");
+    // };
 
 
 
@@ -1885,6 +1886,9 @@ void looppid() {
     else {
         checkWifi();
     }
+
+
+
 
     // Update the temperature:
     temperature = tempSensor->getCurrentTemperature();
