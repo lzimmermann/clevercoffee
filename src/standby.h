@@ -26,6 +26,7 @@ void updateStandbyTimer(void) {
     struct tm* t = localtime(&now);
     int hour = t->tm_hour;
 
+//     LOGF(DEBUG, "Hour:  %i -  STANDBY_TIMER_START_HOUR:%i - STANDBY_TIMER_END_HOUR:%i",hour, STANDBY_TIMER_START_HOUR, STANDBY_TIMER_END_HOUR);
 
   bool insideStandbyTime;
 
@@ -35,7 +36,13 @@ void updateStandbyTimer(void) {
             insideStandbyTime = (hour >= STANDBY_TIMER_START_HOUR || hour < STANDBY_TIMER_END_HOUR);
         }
 
-    if (!insideStandbyTime && ((currentTime % 600000) == 0)) {
+    if (insideStandbyTime && ((currentTime % 60000) == 0)) {
+        LOGF(INFO, "Standby time %i in Standby hours STANDBY_TIMER_START_HOUR:%i STANDBY_TIMER_END_HOUR:%i",hour, STANDBY_TIMER_START_HOUR, STANDBY_TIMER_END_HOUR);
+        return;
+   }
+
+
+    if (!insideStandbyTime && ((currentTime % 60000) == 0)) {
         LOGF(INFO, "Standby time %i not in Standby hours STANDBY_TIMER_START_HOUR:%i STANDBY_TIMER_END_HOUR:%i",hour, STANDBY_TIMER_START_HOUR, STANDBY_TIMER_END_HOUR);
         resetStandbyTimer();
         return;
