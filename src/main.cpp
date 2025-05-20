@@ -9,8 +9,9 @@
 // Firmware version
 #define FW_VERSION    4
 #define FW_SUBVERSION 0
-#define FW_HOTFIX     0
-#define FW_BRANCH     "MASTER"
+#define FW_HOTFIX     2
+#define FW_BRANCH     "LARSZ"
+
 
 // STL includes
 #include <map>
