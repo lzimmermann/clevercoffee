@@ -1518,28 +1518,28 @@ void setup() {
                                           .ptr = (void*)&standbyModeTime};
 
 
-    // neu: Start-Stunde für Standby-Timer (0–23)
+    // Start-Stunde für Standby-Timer (0–23)
     editableVars["STANDBY_TIMER_START_HOUR"] = {
         .displayName = F("Standby Start Hour"),
         .hasHelpText  = true,
         .helpText     = F("Hour (0–23) at which Standby-Timer starts."),
         .type         = kInteger,
         .section      = sPowerSection,
-        .position     = 32,
+        .position     = 41,
         .show         = [] { return true; },
         .minValue     = 0,
         .maxValue     = 23,
         .ptr          = (void*)&standbyTimerStartHour
     };
 
-    // neu: End-Stunde für Standby-Timer (0–23)
+    // End-Stunde für Standby-Timer (0–23)
     editableVars["STANDBY_TIMER_END_HOUR"] = {
         .displayName = F("Standby End Hour"),
         .hasHelpText  = true,
         .helpText     = F("Hour (0–23) at which Standby-Timer ends."),
         .type         = kInteger,
         .section      = sPowerSection,
-        .position     = 33,
+        .position     = 42,
         .show         = [] { return true; },
         .minValue     = 0,
         .maxValue     = 23,
@@ -2191,7 +2191,7 @@ int readSysParamsFromStorage(void) {
     if (sysParaBackflushFlushTime.getStorage() != 0) return -1;
 
 
-   if (sysParaStandbyTimerStartHour.getStorage() != 0) return -1;
+    if (sysParaStandbyTimerStartHour.getStorage() != 0) return -1;
     if (sysParaStandbyTimerEndHour.getStorage()   != 0) return -1;
 
 

@@ -92,7 +92,7 @@ enum MACHINE {
 #define MQTT_SERVER_PORT             1884              // Port of the specified MQTT Server
 #define MQTT_HASSIO_SUPPORT          0                 // Enables the Homeassistant Auto Discovery Feature
 #define MQTT_HASSIO_DISCOVERY_PREFIX "homeassistant"   // Homeassistant Auto Discovery Prefix
-#define MQTT_INTERVAL_MS 500
+#define MQTT_INTERVAL_MS 1000
 
 // PID Parameters (not yet in Web interface)
 #define EMA_FACTOR 0.6 // Smoothing of input that is used for Tv (derivative component of PID). Smaller means less smoothing but also less delay, 0 means no filtering
