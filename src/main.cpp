@@ -9,7 +9,7 @@
 // Firmware version
 #define FW_VERSION    4
 #define FW_SUBVERSION 0
-#define FW_HOTFIX     2
+#define FW_HOTFIX     3
 #define FW_BRANCH     "LARSZ"
 
 
@@ -1667,6 +1667,11 @@ void setup() {
     mqttSensors["currentKd"] = [] { return bPID.GetKd(); };
     mqttSensors["machineState"] = [] { return machineState; };
     mqttSensors["lastBrewTime"] = [] { return lastBrewTime; };
+    mqttSensors["lastAlive"] = [] { return time(nullptr); };
+
+
+
+
 
 #if FEATURE_PRESSURESENSOR == 1
     mqttSensors["pressure"] = [] { return inputPressureFilter; };
@@ -1880,6 +1885,11 @@ void looppid() {
 
     // Update the temperature:
     temperature = tempSensor->getCurrentTemperature();
+
+    unsigned long currentTime = millis();
+    if ((currentTime % 6000) == 0) {
+        LOGF(INFO, "Temperature: %.1f", temperature);
+    }
 
     if (machineState != kSteam) {
         temperature -= brewTempOffset;

@@ -11,7 +11,7 @@
 // firmware version (must match with definitions in the main source file)
 #define USR_FW_VERSION    4
 #define USR_FW_SUBVERSION 0
-#define USR_FW_HOTFIX     2
+#define USR_FW_HOTFIX     3
 #define USR_FW_BRANCH     "LARSZ"
 
 // List of supported machines
