@@ -101,7 +101,7 @@ enum MACHINE {
 
 // Log level for serial console, valid options (all with Logger::Level:: prefix) are:
 // TRACE, DEBUG, INFO, WARNING, ERROR, FATAL
-#define LOGLEVEL Logger::Level::INFO
+#define LOGLEVEL Logger::Level::DEBUG
 
 
 #define STANDBY_TIMER_START_HOUR 18  // Start hour for standby timer (24h format)

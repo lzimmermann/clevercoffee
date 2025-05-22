@@ -1887,7 +1887,7 @@ void looppid() {
     temperature = tempSensor->getCurrentTemperature();
 
     unsigned long currentTime = millis();
-    if ((currentTime % 6000) == 0) {
+    if ((currentTime % 30000) == 0) {
         LOGF(INFO, "Temperature: %.1f", temperature);
     }
 
