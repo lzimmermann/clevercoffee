@@ -75,7 +75,7 @@ enum MACHINE {
 #define FEATURE_PRESSURESENSOR 0                        // 0 = deactivated, 1 = activated
 
 // Brew Scale
-#define FEATURE_SCALE 0 // 0 = deactivated, 1 = activated
+#define FEATURE_SCALE 1 // 0 = deactivated, 1 = activated
 #define SCALE_TYPE    0 // 0 = one HX711 per load cell, 1 = Only a single HX711 with two channels
 #define SCALE_SAMPLES 2 // Load cell sample rate
 
