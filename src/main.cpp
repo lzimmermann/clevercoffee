@@ -1827,6 +1827,12 @@ void setup() {
 
     double fsUsage = ((double)LittleFS.usedBytes() / LittleFS.totalBytes()) * 100;
     LOGF(INFO, "LittleFS: %d%% (used %ld bytes from %ld bytes)", (int)ceil(fsUsage), LittleFS.usedBytes(), LittleFS.totalBytes());
+
+    LOGF(DEBUG, "Standby STANDBY_TIMER_START_HOUR:%i STANDBY_TIMER_END_HOUR:%i", STANDBY_TIMER_START_HOUR, STANDBY_TIMER_END_HOUR);
+
+
+
+
 }
 
 void loop() {
@@ -2195,6 +2201,8 @@ int readSysParamsFromStorage(void) {
     if (sysParaStandbyTimerEndHour.getStorage()   != 0) return -1;
 
 
+    LOGF(INFO, "readSysParamsToStorage:  STANDBY_TIMER_START_HOUR:%i STANDBY_TIMER_END_HOUR:%i", STANDBY_TIMER_START_HOUR, STANDBY_TIMER_END_HOUR);
+
     return 0;
 }
 
@@ -2239,6 +2247,9 @@ int writeSysParamsToStorage(void) {
 
     if (sysParaStandbyTimerStartHour.setStorage() != 0) return -1;
     if (sysParaStandbyTimerEndHour.setStorage()   != 0) return -1;
+
+
+    LOGF(INFO, "writeSysParamsToStorage:  STANDBY_TIMER_START_HOUR:%i STANDBY_TIMER_END_HOUR:%i", STANDBY_TIMER_START_HOUR, STANDBY_TIMER_END_HOUR);
 
     return storageCommit();
 }

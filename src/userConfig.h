@@ -104,8 +104,8 @@ enum MACHINE {
 #define LOGLEVEL Logger::Level::DEBUG
 
 
-#define STANDBY_TIMER_START_HOUR 18  // Start hour for standby timer (24h format)
-#define STANDBY_TIMER_END_HOUR    6 // End hour for standby timer (24h format)
+// #define STANDBY_TIMER_START_HOUR 18  // Start hour for standby timer (24h format)
+// #define STANDBY_TIMER_END_HOUR    6 // End hour for standby timer (24h format)
 
 
 
