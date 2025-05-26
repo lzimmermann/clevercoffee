@@ -20,34 +20,8 @@ unsigned long timeSinceStandbyMillis = 0;
  * @brief Decrements the remaining standby time every second, counting down from the configured duration
  */
 void updateStandbyTimer(void) {
-
+    time_t now = time(nullptr);
     unsigned long currentTime = millis();
- time_t now = time(nullptr);
-    struct tm* t = localtime(&now);
-    int hour = t->tm_hour;
-
-//     LOGF(DEBUG, "Hour:  %i -  STANDBY_TIMER_START_HOUR:%i - STANDBY_TIMER_END_HOUR:%i",hour, STANDBY_TIMER_START_HOUR, STANDBY_TIMER_END_HOUR);
-
-  bool insideStandbyTime;
-
-  if (STANDBY_TIMER_START_HOUR <= STANDBY_TIMER_END_HOUR) {
-        insideStandbyTime = (hour >= STANDBY_TIMER_START_HOUR && hour < STANDBY_TIMER_END_HOUR);
-        } else {
-            insideStandbyTime = (hour >= STANDBY_TIMER_START_HOUR || hour < STANDBY_TIMER_END_HOUR);
-        }
-
-    if (insideStandbyTime && ((currentTime % 60000) == 0)) {
-        LOGF(INFO, "Standby time %i in Standby hours STANDBY_TIMER_START_HOUR:%i STANDBY_TIMER_END_HOUR:%i",hour, STANDBY_TIMER_START_HOUR, STANDBY_TIMER_END_HOUR);
-        return;
-   }
-
-
-    if (!insideStandbyTime && ((currentTime % 60000) == 0)) {
-        LOGF(INFO, "Standby time %i not in Standby hours STANDBY_TIMER_START_HOUR:%i STANDBY_TIMER_END_HOUR:%i",hour, STANDBY_TIMER_START_HOUR, STANDBY_TIMER_END_HOUR);
-        resetStandbyTimer();
-        return;
-   }
-
 
 
     if ((standbyModeRemainingTimeMillis != 0) && ((currentTime % 1000) == 0) && (currentTime != lastStandbyTimeMillis)) {

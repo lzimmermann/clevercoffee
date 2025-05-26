@@ -188,6 +188,7 @@ void setBDPIDTunings();
 void loopcalibrate();
 void looppid();
 void loopLED();
+void loopStandbyTime();
 void checkWaterTank();
 void printMachineState();
 char const* machinestateEnumToString(MachineState machineState);
@@ -1847,8 +1848,45 @@ void loop() {
 
     // Update LED output based on machine state
     loopLED();
+
+    loopStandbyTime();
+    // Check if we are in standby time
+
 }
 
+
+
+void loopStandbyTime(){
+    time_t now = time(nullptr);
+    unsigned long currentTime = millis();
+    struct tm* t = localtime(&now);
+    int hour = t->tm_hour;
+
+//     LOGF(DEBUG, "Hour:  %i -  STANDBY_TIMER_START_HOUR:%i - STANDBY_TIMER_END_HOUR:%i",hour, STANDBY_TIMER_START_HOUR, STANDBY_TIMER_END_HOUR);
+
+  bool insideStandbyTime;
+
+  if (STANDBY_TIMER_START_HOUR <= STANDBY_TIMER_END_HOUR) {
+        insideStandbyTime = (hour >= STANDBY_TIMER_START_HOUR && hour < STANDBY_TIMER_END_HOUR);
+        } else {
+            insideStandbyTime = (hour >= STANDBY_TIMER_START_HOUR || hour < STANDBY_TIMER_END_HOUR);
+        }
+
+    if (insideStandbyTime && ((currentTime % 60000) == 0)) {
+        LOGF(INFO, "Standby time %i in Standby hours STANDBY_TIMER_START_HOUR:%i STANDBY_TIMER_END_HOUR:%i",hour, STANDBY_TIMER_START_HOUR, STANDBY_TIMER_END_HOUR);
+        return;
+   }
+
+
+    if (!insideStandbyTime && ((currentTime % 60000) == 0)) {
+        LOGF(INFO, "Standby time %i not in Standby hours STANDBY_TIMER_START_HOUR:%i STANDBY_TIMER_END_HOUR:%i",hour, STANDBY_TIMER_START_HOUR, STANDBY_TIMER_END_HOUR);
+        resetStandbyTimer();
+        pidON = 1;
+        u8g2.setPowerSave(0);
+        return;
+   }
+
+}
 void looppid() {
     // Only do Wifi stuff, if Wifi is connected
     if (WiFi.status() == WL_CONNECTED && offlineMode == 0) {
