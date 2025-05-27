@@ -174,6 +174,7 @@ Switch* brewSwitch;
 Switch* steamSwitch;
 
 TempSensor* tempSensor;
+TempSensor* tempSensor2;
 
 #include "isr.h"
 
@@ -279,7 +280,7 @@ SysPara<uint8_t> sysParaStandbyModeOn(&standbyModeOn, 0, 1, STO_ITEM_STANDBY_MOD
 SysPara<double> sysParaStandbyModeTime(&standbyModeTime, STANDBY_MODE_TIME_MIN, STANDBY_MODE_TIME_MAX, STO_ITEM_STANDBY_MODE_TIME);
 
 // neu: SysPara für die Standby-Start/End-Hour
-SysPara<uint8_t> sysParaStandbyTimerStartHour(&standbyTimerStartHour, 0, 23, STO_ITEM_STANDBY_TIMER_START_HOUR);
+//SysPara<uint8_t> sysParaStandbyTimerStartHour(&standbyTimerStartHour, 0, 23, STO_ITEM_STANDBY_TIMER_START_HOUR);
 SysPara<uint8_t> sysParaStandbyTimerEndHour(&standbyTimerEndHour, 0, 23, STO_ITEM_STANDBY_TIMER_END_HOUR);
 
 SysPara<float> sysParaScaleCalibration(&scaleCalibration, -100000, 100000, STO_ITEM_SCALE_CALIBRATION_FACTOR);
@@ -314,6 +315,7 @@ double previousInput = 0;
 
 // Variables to hold PID values (Temp input, Heater output)
 double temperature, pidOutput;
+double temperature2;
 int steamON = 0;
 int steamFirstON = 0;
 
@@ -1520,18 +1522,18 @@ void setup() {
 
 
     // Start-Stunde für Standby-Timer (0–23)
-    editableVars["STANDBY_TIMER_START_HOUR"] = {
-        .displayName = F("Standby Start Hour"),
-        .hasHelpText  = true,
-        .helpText     = F("Hour (0–23) at which Standby-Timer starts."),
-        .type         = kInteger,
-        .section      = sPowerSection,
-        .position     = 41,
-        .show         = [] { return true; },
-        .minValue     = 0,
-        .maxValue     = 23,
-        .ptr          = (void*)&standbyTimerStartHour
-    };
+    // editableVars["STANDBY_TIMER_START_HOUR"] = {
+    //     .displayName = F("Standby Start Hour"),
+    //     .hasHelpText  = true,
+    //     .helpText     = F("Hour (0–23) at which Standby-Timer starts."),
+    //     .type         = kInteger,
+    //     .section      = sPowerSection,
+    //     .position     = 42,
+    //     .show         = [] { return true; },
+    //     .minValue     = 0,
+    //     .maxValue     = 23,
+    //     .ptr          = (void*)&standbyTimerStartHour
+    // };
 
     // End-Stunde für Standby-Timer (0–23)
     editableVars["STANDBY_TIMER_END_HOUR"] = {
@@ -1540,7 +1542,7 @@ void setup() {
         .helpText     = F("Hour (0–23) at which Standby-Timer ends."),
         .type         = kInteger,
         .section      = sPowerSection,
-        .position     = 42,
+        .position     = 43,
         .show         = [] { return true; },
         .minValue     = 0,
         .maxValue     = 23,
@@ -1669,7 +1671,13 @@ void setup() {
     mqttSensors["machineState"] = [] { return machineState; };
     mqttSensors["lastBrewTime"] = [] { return lastBrewTime; };
     mqttSensors["lastAlive"] = [] { return time(nullptr); };
+    mqttSensors["standbyModeRemainingTime"] = [] { return standbyModeRemainingTimeMillis / 60000; };
 
+
+
+#if FEATURE_TEMP_SENSOR_2 == 1
+    mqttSensors["temperature2"] = [] { return temperature2; };
+#endif
 
 
 
@@ -1800,6 +1808,19 @@ void setup() {
 
     temperature -= brewTempOffset;
 
+
+// Secondary temperature sensor
+#if FEATURE_TEMP_SENSOR_2 == 1
+    if (TEMP_SENSOR_2 == 1) {
+        tempSensor2 = new TempSensorDallas(PIN_TEMPSENSOR_2);
+    }
+    else if (TEMP_SENSOR_2 == 2) {
+        tempSensor2 = new TempSensorTSIC(PIN_TEMPSENSOR_2);
+    }
+    temperature2 = tempSensor2->getCurrentTemperature();
+#endif
+
+
 // Init Scale
 #if FEATURE_SCALE == 1
     initScale();
@@ -1829,7 +1850,7 @@ void setup() {
     double fsUsage = ((double)LittleFS.usedBytes() / LittleFS.totalBytes()) * 100;
     LOGF(INFO, "LittleFS: %d%% (used %ld bytes from %ld bytes)", (int)ceil(fsUsage), LittleFS.usedBytes(), LittleFS.totalBytes());
 
-    LOGF(DEBUG, "Standby STANDBY_TIMER_START_HOUR:%i STANDBY_TIMER_END_HOUR:%i", STANDBY_TIMER_START_HOUR, STANDBY_TIMER_END_HOUR);
+//    LOGF(DEBUG, "Standby STANDBY_TIMER_START_HOUR:%i STANDBY_TIMER_END_HOUR:%i", STANDBY_TIMER_START_HOUR, STANDBY_TIMER_END_HOUR);
 
 
 
@@ -1859,10 +1880,12 @@ void loop() {
 void loopStandbyTime(){
     time_t now = time(nullptr);
     unsigned long currentTime = millis();
+
+    if ((currentTime % 6000) != 0) {return; }
+
+
     struct tm* t = localtime(&now);
     int hour = t->tm_hour;
-
-//     LOGF(DEBUG, "Hour:  %i -  STANDBY_TIMER_START_HOUR:%i - STANDBY_TIMER_END_HOUR:%i",hour, STANDBY_TIMER_START_HOUR, STANDBY_TIMER_END_HOUR);
 
   bool insideStandbyTime;
 
@@ -1933,7 +1956,20 @@ void looppid() {
     unsigned long currentTime = millis();
     if ((currentTime % 30000) == 0) {
         LOGF(INFO, "Temperature: %.1f", temperature);
+  //  }
+
+
+#if FEATURE_TEMP_SENSOR_2 == 1
+    temperature2 = tempSensor2->getCurrentTemperature();
+
+    currentTime = millis();
+//    if ((currentTime % 30000) == 0) {
+        LOGF(INFO, "Temperature 2: %.1f", temperature2);
     }
+#endif
+    // If we have a second temperature sensor, read it
+
+
 
     if (machineState != kSteam) {
         temperature -= brewTempOffset;
@@ -2235,7 +2271,7 @@ int readSysParamsFromStorage(void) {
     if (sysParaBackflushFlushTime.getStorage() != 0) return -1;
 
 
-    if (sysParaStandbyTimerStartHour.getStorage() != 0) return -1;
+//    if (sysParaStandbyTimerStartHour.getStorage() != 0) return -1;
     if (sysParaStandbyTimerEndHour.getStorage()   != 0) return -1;
 
 
@@ -2283,7 +2319,7 @@ int writeSysParamsToStorage(void) {
     if (sysParaBackflushFillTime.setStorage() != 0) return -1;
     if (sysParaBackflushFlushTime.setStorage() != 0) return -1;
 
-    if (sysParaStandbyTimerStartHour.setStorage() != 0) return -1;
+//    if (sysParaStandbyTimerStartHour.setStorage() != 0) return -1;
     if (sysParaStandbyTimerEndHour.setStorage()   != 0) return -1;
 
 
