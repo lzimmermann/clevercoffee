@@ -2121,28 +2121,26 @@ void looppid() {
 }
 
 void loopLED() {
+
+    if (FEATURE_STATUS_LED) {
     //Larsz implementation only
-if (FEATURE_STATUS_LED_ON_POWER==0) {
+        if (FEATURE_STATUS_LED_ON_POWER==0) {
+            if ((machineState == kPidNormal && (fabs(temperature - setpoint) < 0.3)) || (temperature > 115 && fabs(temperature - setpoint) < 5)) {
+                statusLed->turnOn();
+            }
+            else {
+                statusLed->turnOff();
+            }
+        }   else {
 
-    if (FEATURE_STATUS_LED) {
-        if ((machineState == kPidNormal && (fabs(temperature - setpoint) < 0.3)) || (temperature > 115 && fabs(temperature - setpoint) < 5)) {
-            statusLed->turnOn();
-        }
-        else {
-            statusLed->turnOff();
+            if ((machineState == kPidNormal && (fabs(temperature - setpoint) < 0.3)) || (temperature > 115 && fabs(temperature - setpoint) < 5)) {
+                statusLed->turnOff();
+            }
+            else {
+                statusLed->turnOn();
+            }
         }
     }
-}else {
-
-    if (FEATURE_STATUS_LED) {
-        if ((machineState == kPidNormal && (fabs(temperature - setpoint) < 0.3)) || (temperature > 115 && fabs(temperature - setpoint) < 5)) {
-            statusLed->turnOff();
-        }
-        else {
-            statusLed->turnOn();
-        }
-    }
-}
     if (FEATURE_BREW_LED) {
         if (machineState == kBrew) {
             brewLed->turnOn();
