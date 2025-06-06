@@ -32,7 +32,7 @@ enum MACHINE {
 // Display
 #define OLED_DISPLAY          2       // 0 = deactivated, 1 = SH1106 (e.g. 1.3 "128x64), 2 = SSD1306 (e.g. 0.96" 128x64), 3 = SH1106_126x64_SPI
 #define OLED_I2C              0x3C    // I2C address for OLED, 0x3C by default
-#define DISPLAYTEMPLATE       3       // 1 = Standard display template, 2 = Minimal template, 3 = only temperature, 4 = scale template, 20 = vertical display (see git Handbook for further information)
+#define DISPLAYTEMPLATE       4       // 1 = Standard display template, 2 = Minimal template, 3 = only temperature, 4 = scale template, 20 = vertical display (see git Handbook for further information)
 #define DISPLAYROTATE         U8G2_R0 // rotate display clockwise: U8G2_R0 = no rotation; U8G2_R1 = 90°; U8G2_R2 = 180°; U8G2_R3 = 270°
 #define SCREEN_WIDTH          128     // OLED display width, in pixels
 #define SCREEN_HEIGHT         64      // OLED display height, in pixels
@@ -45,7 +45,8 @@ enum MACHINE {
 
 // Connectivity
 #define CONNECTMODE         1              // 0 = offline 1 = WIFI-MODE
-#define HOSTNAME            "ECM"
+#define HOSTNAME            "ECM_DEVBOARD"
+//#define HOSTNAME            "ECM"
 #define PASS                "wifi" // default password for WiFiManager
 #define MAXWIFIRECONNECTS   5              // maximum number of reconnection attempts, use -1 to deactivate
 #define WIFICONNECTIONDELAY 10000          // delay between reconnects in ms
@@ -54,19 +55,20 @@ enum MACHINE {
 #define FEATURE_BREWCONTROL     0                       // 0 = deactivated, 1 = activated
 #define FEATURE_BREWDETECTION   1                       // 0 = deactivated, 1 = activated
 #define BREWDETECTION_TYPE      3                       // 1 = Software (FEATURE_BREWCONTROL 0), 2 = Hardware (FEATURE_BREWCONTROL 1), 3 = Optocoupler (FEATURE_BREWCONTROL 0)
-#define FEATURE_POWERSWITCH     0                       // 0 = deactivated, 1 = activated
+#define FEATURE_POWERSWITCH     1                       // 0 = deactivated, 1 = activated
 #define POWERSWITCH_TYPE        Switch::TOGGLE          // Switch::TOGGLE or Switch::MOMENTARY (trigger)
 #define POWERSWITCH_MODE        Switch::NORMALLY_OPEN   // Switch::NORMALLY_OPEN or Switch::NORMALLY_CLOSED
 #define FEATURE_BREWSWITCH      0                       // 0 = deactivated, 1 = activated
 #define BREWSWITCH_TYPE         Switch::TOGGLE          // Switch::TOGGLE or Switch::MOMENTARY (trigger)
 #define BREWSWITCH_MODE         Switch::NORMALLY_OPEN   // Switch::NORMALLY_OPEN or Switch::NORMALLY_CLOSED
-#define FEATURE_STEAMSWITCH     0                       // 0 = deactivated, 1 = activated
+#define FEATURE_STEAMSWITCH     1                       // 0 = deactivated, 1 = activated
 #define STEAMSWITCH_TYPE        Switch::TOGGLE          // Switch::TOGGLE or Switch::MOMENTARY (trigger)
 #define OPTOCOUPLER_TYPE        LOW                    // BREWDETECTION 3 configuration; HIGH or LOW trigger optocoupler
 #define STEAMSWITCH_MODE        Switch::NORMALLY_OPEN   // Switch::NORMALLY_OPEN or Switch::NORMALLY_CLOSED
 #define HEATER_SSR_TYPE         Relay::HIGH_TRIGGER     // HIGH_TRIGGER = relay switches when input is HIGH, vice versa for LOW_TRIGGER
 #define PUMP_VALVE_SSR_TYPE     Relay::HIGH_TRIGGER     // HIGH_TRIGGER = relay switches when input is HIGH, vice versa for LOW_TRIGGER
 #define FEATURE_STATUS_LED      1                       // Blink status LED when temp is in range, 0 = deactivated, 1 = activated
+#define FEATURE_STATUS_LED_ON_POWER     1               // 0 = Blink status LED when temp is in range, 1 = Blink when heating <-- larsz
 #define FEATURE_BREW_LED        0                       // Turn on brew LED when brew is started, 0 = deactivated, 1 = activated
 #define LED_TYPE                LED::STANDARD           // STANDARD_LED for an LED connected to a GPIO pin, WS2812 for adressable LEDs
 #define FEATURE_WATERTANKSENSOR 0                       // 0 = deactivated, 1 = activated
@@ -77,8 +79,8 @@ enum MACHINE {
 #define FEATURE_PRESSURESENSOR 0                        // 0 = deactivated, 1 = activated
 
 // Brew Scale
-#define FEATURE_SCALE 0 // 0 = deactivated, 1 = activated
-#define SCALE_TYPE    0 // 0 = one HX711 per load cell, 1 = Only a single HX711 with two channels
+#define FEATURE_SCALE 1 // 0 = deactivated, 1 = activated
+#define SCALE_TYPE    1 // 0 = one HX711 per load cell, 1 = Only a single HX711 with two channels
 #define SCALE_SAMPLES 2 // Load cell sample rate
 
 // PlatformIO OTA
@@ -105,7 +107,7 @@ enum MACHINE {
 
 // Log level for serial console, valid options (all with Logger::Level:: prefix) are:
 // TRACE, DEBUG, INFO, WARNING, ERROR, FATAL
-#define LOGLEVEL Logger::Level::DEBUG
+#define LOGLEVEL Logger::Level::INFO
 
 
 // #define STANDBY_TIMER_START_HOUR 18  // Start hour for standby timer (24h format)
