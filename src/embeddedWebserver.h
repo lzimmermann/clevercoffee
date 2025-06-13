@@ -45,6 +45,7 @@ AsyncWebServer server(80);
 AsyncEventSource events("/events");
 
 double curTemp = 0.0;
+double curTemp2 = 0.0;
 double tTemp = 0.0;
 double hPower = 0.0;
 
@@ -53,6 +54,12 @@ double hPower = 0.0;
 static float tempHistory[3][HISTORY_LENGTH] = {0};
 int historyCurrentIndex = 0;
 int historyValueCount = 0;
+
+
+static float tempHistory2[3][HISTORY_LENGTH] = {0};
+int historyCurrentIndex2 = 0;
+int historyValueCount2 = 0;
+
 
 void serverSetup();
 void setEepromWriteFcn(int (*fcnPtr)(void));
@@ -76,6 +83,7 @@ String getTempString() {
     StaticJsonDocument<96> doc;
 
     doc["currentTemp"] = curTemp;
+    doc["currentTemp2"] = curTemp2;
     doc["targetTemp"] = tTemp;
     doc["heaterPower"] = hPower;
 
@@ -84,6 +92,7 @@ String getTempString() {
 
     return jsonTemps;
 }
+
 
 // proper modulo function (% is remainder, so will return negatives)
 int mod(int a, int b) {
@@ -446,6 +455,7 @@ void serverSetup() {
 
         // for each value in mem history array, add json array element
         JsonArray currentTemps = doc.createNestedArray("currentTemps");
+        JsonArray currentTemps2 = doc.createNestedArray("currentTemps2");
         JsonArray targetTemps = doc.createNestedArray("targetTemps");
         JsonArray heaterPowers = doc.createNestedArray("heaterPowers");
 
@@ -453,6 +463,7 @@ void serverSetup() {
         // wrap around beginning to include valueCount many values
         for (int i = mod(historyCurrentIndex - historyValueCount, HISTORY_LENGTH); i != mod(historyCurrentIndex, HISTORY_LENGTH); i = mod(i + 1, HISTORY_LENGTH)) {
             currentTemps.add(round2(tempHistory[0][i]));
+            currentTemps2.add(round2(tempHistory2[0][i]));
             targetTemps.add(round2(tempHistory[1][i]));
             heaterPowers.add(round2(tempHistory[2][i]));
         }
@@ -520,6 +531,33 @@ void sendTempEvent(double currentTemp, double targetTemp, double heaterPower) {
     }
     else {
         skippedValues++;
+    }
+
+    events.send("ping", NULL, millis());
+    events.send(getTempString().c_str(), "new_temps", millis());
+}
+
+
+int skippedValues2 = 0;
+void sendTempEvent2(double currentTemp2, double targetTemp, double heaterPower) {
+    curTemp = currentTemp2;
+    tTemp = targetTemp;
+    hPower = heaterPower;
+
+    // save all values in memory to show history
+    if (skippedValues2 > 0 && skippedValues2 % SECONDS_TO_SKIP == 0) {
+        // use array and int value for start index (round robin)
+        // one record (3 float values == 12 bytes) every three seconds, for half
+        // an hour -> 7.2kB of static memory
+        tempHistory2[0][historyCurrentIndex] = (float)currentTemp2;
+        tempHistory2[1][historyCurrentIndex] = (float)targetTemp;
+        tempHistory2[2][historyCurrentIndex] = (float)heaterPower;
+        historyCurrentIndex2 = (historyCurrentIndex2 + 1) % HISTORY_LENGTH;
+        historyValueCount2 = min(HISTORY_LENGTH - 1, historyValueCount + 1);
+        skippedValues2 = 0;
+    }
+    else {
+        skippedValues2++;
     }
 
     events.send("ping", NULL, millis());

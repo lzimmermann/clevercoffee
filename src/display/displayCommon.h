@@ -138,6 +138,27 @@ void displayTemperature(int x, int y) {
     u8g2.drawCircle(x + 72, y + 4, 3);
 }
 
+
+// /**
+//  * @brief Draw the temperature2 in big font at given position
+//  */
+// void displayTemperature2(int x, int y) {
+//     u8g2.setFont(u8g2_font_fub30_tf);
+
+//     if (temperature < 99.499) {
+//         u8g2.setCursor(x + 20, y);
+//         u8g2.print(temperature2, 0);
+//     }
+//     else {
+//         u8g2.setCursor(x, y);
+//         u8g2.print(temperature2, 0);
+//     }
+
+//     u8g2.drawCircle(x + 72, y + 4, 3);
+// }
+
+
+
 /**
  * @brief determines if brew timer should be visible; postBrewTimerDuration defines how long the timer after the brew is shown
  * @return true if timer should be visible, false otherwise

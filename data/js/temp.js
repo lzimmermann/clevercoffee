@@ -51,10 +51,10 @@ function addTempData(jsonValue, isSingleValue=false) {
         var targetTemp = jsonValue[targetTempKey]
         targetTempVals.length = 0
         targetTempVals.push(...targetTemp)
-        
+
         // create dates for all history values (3 seconds between each value)
         tempDates.length = 0
-        
+
         for (let i=curTempVals.length; i>0; i--) {
             var date = new Date()
             date.setSeconds(date.getSeconds()-3*i)
@@ -77,13 +77,80 @@ function addTempData(jsonValue, isSingleValue=false) {
     ];
 
     for (let i = 0; i < curTempVals.length; i++) {
-        data[0][i] = tempDates[i].getTime() / updateInterval 
+        data[0][i] = tempDates[i].getTime() / updateInterval
         data[1][i] = curTempVals[i]
         data[2][i] = targetTempVals[i]
     }
 
     return data
 }
+
+
+function addTempData2(jsonValue, isSingleValue=false) {
+    // add new value(s) to global data arrays and return in a
+    // format that uPlot can use
+
+    if (isSingleValue) {
+        const curTempKey = "currentTemp2"
+        const targetTempKey = "targetTemp"
+
+        // add new value to data lists
+        var date = new Date()
+        tempDates.push(date)
+
+        var curTemp = jsonValue[curTempKey]
+        curTempVals.push(curTemp)
+
+        var targetTemp = jsonValue[targetTempKey]
+        targetTempVals.push(targetTemp)
+    }
+    else {
+        const curTempKey = "currentTemps2"
+        const targetTempKey = "targetTemps"
+
+        // set data lists to values from history json
+        var curTemp = jsonValue[curTempKey]
+        curTempVals.length = 0  //reset existing list
+        curTempVals.push(...curTemp)
+
+        var targetTemp = jsonValue[targetTempKey]
+        targetTempVals.length = 0
+        targetTempVals.push(...targetTemp)
+
+        // create dates for all history values (3 seconds between each value)
+        tempDates.length = 0
+
+        for (let i=curTempVals.length; i>0; i--) {
+            var date = new Date()
+            date.setSeconds(date.getSeconds()-3*i)
+            tempDates.push(date)
+        }
+    }
+
+    // reduce data if we have too much (sliding window after that amount)
+    if (tempDates.length > maxValues) {
+        tempDates.splice(0, tempDates.length - maxValues)
+        curTempVals.splice(0, curTempVals.length - maxValues)
+        targetTempVals.splice(0, targetTempVals.length - maxValues)
+    }
+
+    // use data lists to create data array for uPlot
+    let data = [
+        Array(tempDates.length),
+        Array(curTempVals.length),
+        Array(targetTempVals.length),
+    ];
+
+    for (let i = 0; i < curTempVals.length; i++) {
+        data[0][i] = tempDates[i].getTime() / updateInterval
+        data[1][i] = curTempVals[i]
+        data[2][i] = targetTempVals[i]
+    }
+
+    return data
+}
+
+
 
 function addHeaterData(jsonValue, isSingleValue=false) {
     if (isSingleValue) {
@@ -103,10 +170,10 @@ function addHeaterData(jsonValue, isSingleValue=false) {
         var heaterPower = jsonValue[heaterPowerKey]
         heaterPowerVals.length = 0
         heaterPowerVals.push(...heaterPower)
-        
+
         // create dates for all history values (3 seconds between each value)
         heaterDates.length = 0
-        
+
         for (let i=heaterPowerVals.length; i>0; i--) {
             var date = new Date()
             date.setSeconds(date.getSeconds()-3*i)
@@ -127,7 +194,7 @@ function addHeaterData(jsonValue, isSingleValue=false) {
     ];
 
     for (let i = 0; i < heaterPowerVals.length; i++) {
-        data[0][i] = heaterDates[i].getTime() / updateInterval 
+        data[0][i] = heaterDates[i].getTime() / updateInterval
         data[1][i] = heaterPowerVals[i]
     }
 
@@ -183,12 +250,12 @@ function pathRenderer(u, seriesIdx, idx0, idx1, extendGap, buildClip) {
     else if (style == drawStyles.barsLeft) {
         renderer = _bars100Left
     }
-    else if (style == drawStyles.barsRight) { 
+    else if (style == drawStyles.barsRight) {
         renderer = _bars100Right
     }
     else if (style == drawStyles.points) {
         renderer = () => null
-    } 
+    }
 
     return renderer(u, seriesIdx, idx0, idx1, extendGap, buildClip);
 };
@@ -213,13 +280,13 @@ function makeTempChart(data) {
                 show: true,
                 stroke: "#008080",
                 fill: "#00808010",
-                width: 2,            
+                width: 2,
                 points: { show: false },
                 drawStyle: drawStyles.line,
 				lineInterpolation: lineInterpolations.spline,
                 paths: pathRenderer,
             }),
-            
+
             {
                 label: "Target Temperature",
                 scale: "C",
@@ -244,7 +311,7 @@ function makeTempChart(data) {
             }
         ],
     };
-    
+
     uplotTemp = new uPlot(opts, sliceData(data, 0, data.length), document.getElementById(chartDiv));
 }
 
@@ -288,17 +355,17 @@ function makeHeaterChart(data) {
             },
         ],
     };
-    
+
     uplotHeater = new uPlot(opts, sliceData(data, 0, data.length), document.getElementById(heaterDiv));
 }
 
 // append single historic values
-function addPlotData(jsonValue) {    
+function addPlotData(jsonValue) {
     function addData(data, u) {
         let isTempZoomed = u.scales.x.min != u.data[0][0] || u.scales.x.max != u.data[0][u.data[0].length-1];
 
         if (isTempZoomed) {
-            let tempXScaleMinMax = [u.scales.x.min, u.scales.x.max]            
+            let tempXScaleMinMax = [u.scales.x.min, u.scales.x.max]
             // add data but don't autoscale
             u.setData(data, false);
             // move the zoomed area one value to the right so the window stays the same
@@ -383,11 +450,26 @@ if (!!window.EventSource) {
     )
 
     source.addEventListener(
+        'new_temps2',
+        function (e) {
+            var myObj = JSON.parse(e.data)
+
+            // add new data to existing for plotting
+            addPlotData(myObj)
+
+            // update current temp value on index page
+            document.getElementById("varTEMP2").innerText = myObj["currentTemp2"].toFixed(1)
+        },
+        false
+    )
+
+
+    source.addEventListener(
         'new_temps',
         function (e) {
             var myObj = JSON.parse(e.data)
-            
-            // add new data to existing for plotting            
+
+            // add new data to existing for plotting
             addPlotData(myObj)
 
             // update current temp value on index page
@@ -395,4 +477,5 @@ if (!!window.EventSource) {
         },
         false
     )
+
 }
