@@ -1,6 +1,0 @@
-git remote add upstream https://github.com/rancilio-pid/clevercoffee.git
-
-
-
-
-
