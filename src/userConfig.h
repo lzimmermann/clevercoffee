@@ -11,7 +11,7 @@
 #define USR_FW_VERSION    4
 #define USR_FW_SUBVERSION 0
 #define USR_FW_HOTFIX     0
-#define USR_FW_BRANCH     "MASTER"
+#define USR_FW_BRANCH     "LARSZ"
 
 /**
  * Preconfiguration
