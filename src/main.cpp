@@ -153,6 +153,7 @@ Switch* brewSwitch;
 Switch* steamSwitch;
 
 TempSensor* tempSensor;
+TempSensor* tempSensor2;
 
 #include "isr.h"
 
@@ -221,6 +222,7 @@ double standbyModeTime = STANDBY_MODE_TIME;
 
 // Variables to hold PID values (Temp input, Heater output)
 double temperature, pidOutput;
+double temperature2;
 int steamON = 0;
 int steamFirstON = 0;
 
@@ -1413,6 +1415,10 @@ void setup() {
     mqttSensors["currBrewWeight"] = [] { return currBrewWeight; };
 #endif
 
+#if FEATURE_TEMP_SENSOR_2 == 1
+    mqttSensors["temperature2"] = [] { return temperature2; };
+#endif
+
 #if FEATURE_PRESSURESENSOR == 1
     mqttSensors["pressure"] = [] { return inputPressureFilter; };
 #endif
@@ -1518,6 +1524,17 @@ void setup() {
     temperature = tempSensor->getCurrentTemperature();
 
     temperature -= brewTempOffset;
+
+
+    #if FEATURE_TEMP_SENSOR_2 == 1
+    if (TEMP_SENSOR_2 == 1) {
+        tempSensor2 = new TempSensorDallas(PIN_TEMPSENSOR_2);
+    }
+    else if (TEMP_SENSOR_2 == 2) {
+        tempSensor2 = new TempSensorTSIC(PIN_TEMPSENSOR_2);
+    }
+    temperature2 = tempSensor2->getCurrentTemperature();
+#endif
 
 // Init Scale
 #if FEATURE_SCALE == 1

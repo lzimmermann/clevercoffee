@@ -27,6 +27,7 @@
 #define PIN_HXDAT           32 // Brew scale data pin 1
 #define PIN_HXDAT2          25 // Brew scale data pin 2
 #define PIN_HXCLK           33 // Brew scale clock pin
+#define PIN_TEMPSENSOR_2    4 // Additional temperature sensor
 
 /**
  * Output pins

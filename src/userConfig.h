@@ -53,10 +53,12 @@
 #define FEATURE_WATERTANKSENSOR 0                       // 0 = deactivated, 1 = activated
 #define WATERTANKSENSOR_TYPE    Switch::NORMALLY_CLOSED // Switch::NORMALLY_CLOSED for sensor XKC-Y25-NPN or Switch::NORMALLY_OPEN for XKC-Y25-PNP
 
-#define FEATURE_PRESSURESENSOR 0                        // 0 = deactivated, 1 = activated
+#define FEATURE_PRESSURESENSOR  0                        // 0 = deactivated, 1 = activated
+#define FEATURE_TEMP_SENSOR_2   1                       // 0 = deactivated, 1 = activated
+
 
 // Brew Scale
-#define FEATURE_SCALE 0 // 0 = deactivated, 1 = activated
+#define FEATURE_SCALE 1 // 0 = deactivated, 1 = activated
 #define SCALE_TYPE    0 // 0 = one HX711 per load cell, 1 = Only a single HX711 with two channels
 #define SCALE_SAMPLES 2 // Load cell sample rate
 
@@ -79,6 +81,9 @@
 #define EMA_FACTOR 0.6 // Smoothing of input that is used for Tv (derivative component of PID). Smaller means less smoothing but also less delay, 0 means no filtering
 
 #define TEMP_SENSOR 2  // Temp sensor type: 1 = DS18B20, 2 = TSIC306
+
+#define FEATURE_TEMP_SENSOR_2   1                       // 0 = deactivated, 1 = activated
+#define TEMP_SENSOR_2 1  // Temp sensor type: 1 = DS18B20, 2 = TSIC306
 
 // Log level for serial console, valid options (all with Logger::Level:: prefix) are:
 // TRACE, DEBUG, INFO, WARNING, ERROR, FATAL
