@@ -246,8 +246,8 @@ double brewPIDDelay = BREW_PID_DELAY;    // use userConfig brew detection PID de
 
 uint8_t standbyModeOn = 0;
 double standbyModeTime = STANDBY_MODE_TIME;
-uint8_t standbyTimerStartHour = STANDBY_TIMER_START_HOUR;
-uint8_t standbyTimerEndHour = STANDBY_TIMER_END_HOUR;
+// uint8_t standbyTimerStartHour = STANDBY_TIMER_START_HOUR;
+// uint8_t standbyTimerEndHour = STANDBY_TIMER_END_HOUR;
 
 #include "standby.h"
 
@@ -280,8 +280,8 @@ SysPara<uint8_t> sysParaStandbyModeOn(&standbyModeOn, 0, 1, STO_ITEM_STANDBY_MOD
 SysPara<double> sysParaStandbyModeTime(&standbyModeTime, STANDBY_MODE_TIME_MIN, STANDBY_MODE_TIME_MAX, STO_ITEM_STANDBY_MODE_TIME);
 
 // neu: SysPara für die Standby-Start/End-Hour
-SysPara<uint8_t> sysParaStandbyTimerStartHour(&standbyTimerStartHour, 0, 23, STO_ITEM_STANDBY_TIMER_START_HOUR);
-SysPara<uint8_t> sysParaStandbyTimerEndHour(&standbyTimerEndHour, 0, 23, STO_ITEM_STANDBY_TIMER_END_HOUR);
+// SysPara<uint8_t> sysParaStandbyTimerStartHour(&standbyTimerStartHour, 0, 23, STO_ITEM_STANDBY_TIMER_START_HOUR);
+// SysPara<uint8_t> sysParaStandbyTimerEndHour(&standbyTimerEndHour, 0, 23, STO_ITEM_STANDBY_TIMER_END_HOUR);
 
 SysPara<float> sysParaScaleCalibration(&scaleCalibration, -100000, 100000, STO_ITEM_SCALE_CALIBRATION_FACTOR);
 SysPara<float> sysParaScale2Calibration(&scale2Calibration, -100000, 100000, STO_ITEM_SCALE2_CALIBRATION_FACTOR);
@@ -1522,32 +1522,32 @@ void setup() {
 
 
 //    Start-Stunde für Standby-Timer (0–23)
-    editableVars["STANDBY_TIMER_START_HOUR"] = {
-        .displayName = F("Standby Start Hour"),
-        .hasHelpText  = true,
-        .helpText     = F("Hour (0–23) at which Standby-Timer starts."),
-        .type         = kInteger,
-        .section      = sPowerSection,
-        .position     = 43,
-        .show         = [] { return true; },
-        .minValue     = 0,
-        .maxValue     = 23,
-        .ptr          = (void*)&standbyTimerStartHour
-    };
+    // editableVars["STANDBY_TIMER_START_HOUR"] = {
+    //     .displayName = F("Standby Start Hour"),
+    //     .hasHelpText  = true,
+    //     .helpText     = F("Hour (0–23) at which Standby-Timer starts."),
+    //     .type         = kInteger,
+    //     .section      = sPowerSection,
+    //     .position     = 43,
+    //     .show         = [] { return true; },
+    //     .minValue     = 0,
+    //     .maxValue     = 23,
+    //     .ptr          = (void*)&standbyTimerStartHour
+    // };
 
-    // End-Stunde für Standby-Timer (0–23)
-    editableVars["STANDBY_TIMER_END_HOUR"] = {
-        .displayName = F("Standby End Hour"),
-        .hasHelpText  = true,
-        .helpText     = F("Hour (0–23) at which Standby-Timer ends."),
-        .type         = kInteger,
-        .section      = sPowerSection,
-        .position     = 42,
-        .show         = [] { return true; },
-        .minValue     = 0,
-        .maxValue     = 23,
-        .ptr          = (void*)&standbyTimerEndHour
-    };
+    // // End-Stunde für Standby-Timer (0–23)
+    // editableVars["STANDBY_TIMER_END_HOUR"] = {
+    //     .displayName = F("Standby End Hour"),
+    //     .hasHelpText  = true,
+    //     .helpText     = F("Hour (0–23) at which Standby-Timer ends."),
+    //     .type         = kInteger,
+    //     .section      = sPowerSection,
+    //     .position     = 42,
+    //     .show         = [] { return true; },
+    //     .minValue     = 0,
+    //     .maxValue     = 23,
+    //     .ptr          = (void*)&standbyTimerEndHour
+    // };
 
 
 
@@ -2299,8 +2299,8 @@ int readSysParamsFromStorage(void) {
     if (sysParaBackflushFlushTime.getStorage() != 0) return -1;
 
 
-    if (sysParaStandbyTimerEndHour.getStorage()   != 0) return -1;
-    if (sysParaStandbyTimerStartHour.getStorage() != 0) return -1;
+    // if (sysParaStandbyTimerEndHour.getStorage()   != 0) return -1;
+    // if (sysParaStandbyTimerStartHour.getStorage() != 0) return -1;
 
 
     LOGF(INFO, "readSysParamsToStorage:  STANDBY_TIMER_START_HOUR:%i STANDBY_TIMER_END_HOUR:%i", STANDBY_TIMER_START_HOUR, STANDBY_TIMER_END_HOUR);
@@ -2347,8 +2347,8 @@ int writeSysParamsToStorage(void) {
     if (sysParaBackflushFillTime.setStorage() != 0) return -1;
     if (sysParaBackflushFlushTime.setStorage() != 0) return -1;
 
-    if (sysParaStandbyTimerStartHour.setStorage() != 0) return -1;
-    if (sysParaStandbyTimerEndHour.setStorage()   != 0) return -1;
+    // if (sysParaStandbyTimerStartHour.setStorage() != 0) return -1;
+    // if (sysParaStandbyTimerEndHour.setStorage()   != 0) return -1;
 
 
     LOGF(INFO, "writeSysParamsToStorage:  STANDBY_TIMER_START_HOUR:%i STANDBY_TIMER_END_HOUR:%i", STANDBY_TIMER_START_HOUR, STANDBY_TIMER_END_HOUR);
