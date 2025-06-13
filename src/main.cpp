@@ -870,6 +870,18 @@ void wiFiSetup() {
 #endif
     }
 
+
+
+
+
+    // Get MAC address and create hostname with last 4 hex digits (no ':')
+    byte mac[6];
+    WiFi.macAddress(mac);
+    char macSuffix[5];
+    snprintf(macSuffix, sizeof(macSuffix), "%02X%02X", mac[4], mac[5]);
+    String fullHostname = String(hostname) + "_" + macSuffix;
+    hostname= fullHostname.c_str();
+
     wm.setHostname(hostname);
 
     if (wm.autoConnect(hostname, pass)) {
@@ -1526,7 +1538,7 @@ void setup() {
     temperature -= brewTempOffset;
 
 
-    #if FEATURE_TEMP_SENSOR_2 == 1
+#if FEATURE_TEMP_SENSOR_2 == 1
     if (TEMP_SENSOR_2 == 1) {
         tempSensor2 = new TempSensorDallas(PIN_TEMPSENSOR_2);
     }
@@ -1625,6 +1637,13 @@ void looppid() {
     if (machineState != kSteam) {
         temperature -= brewTempOffset;
     }
+
+
+
+#if FEATURE_TEMP_SENSOR_2 == 1
+    temperature2 = tempSensor2->getCurrentTemperature();
+#endif
+
 
     testEmergencyStop(); // test if temp is too high
     bPID.Compute();      // the variable pidOutput now has new values from PID (will be written to heater pin in ISR.cpp)

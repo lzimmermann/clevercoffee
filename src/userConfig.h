@@ -54,7 +54,6 @@
 #define WATERTANKSENSOR_TYPE    Switch::NORMALLY_CLOSED // Switch::NORMALLY_CLOSED for sensor XKC-Y25-NPN or Switch::NORMALLY_OPEN for XKC-Y25-PNP
 
 #define FEATURE_PRESSURESENSOR  0                        // 0 = deactivated, 1 = activated
-#define FEATURE_TEMP_SENSOR_2   1                       // 0 = deactivated, 1 = activated
 
 
 // Brew Scale
