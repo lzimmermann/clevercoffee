@@ -47,7 +47,7 @@ enum MACHINE {
 #define CONNECTMODE         1              // 0 = offline 1 = WIFI-MODE
 #define HOSTNAME            "ECM_DEVBOARD"
 //#define HOSTNAME            "ECM"
-#define PASS                "wifi" // default password for WiFiManager
+#define PASS                "wifi1234!" // default password for WiFiManager
 #define MAXWIFIRECONNECTS   5              // maximum number of reconnection attempts, use -1 to deactivate
 #define WIFICONNECTIONDELAY 10000          // delay between reconnects in ms
 
@@ -110,8 +110,8 @@ enum MACHINE {
 #define LOGLEVEL Logger::Level::INFO
 
 
-// #define STANDBY_TIMER_START_HOUR 18  // Start hour for standby timer (24h format)
-// #define STANDBY_TIMER_END_HOUR    6 // End hour for standby timer (24h format)
+ #define STANDBY_TIMER_START_HOUR 18  // Start hour for standby timer (24h format)
+ #define STANDBY_TIMER_END_HOUR    6 // End hour for standby timer (24h format)
 
 
 
