@@ -1,6 +1,6 @@
 %HEADER%
     %VAR_HEADER_VUE_NUMBER_INPUT%
-    %VAR_HEADER_UPLOT%    
+    %VAR_HEADER_UPLOT%
 
     <script type="module">
         if (window.appCreated == true) {
@@ -25,11 +25,15 @@
                 <div class="card-body">
                     <form @submit.prevent="postParameters">
                         <div class="row row-cols-1 row-cols-md-3">
-                            <div class="col-md-5 mb-4">
-                                <label class="form-label me-1 col-form-label">Current Temperature</label><br/>
+                            <!-- <div class="col-md-5 mb-4">
+                                <label class="form-label me-1 col-form-label">Current Temperature 1</label><br/>
                                 <b><span id="varTEMP"></span> °C</b>
+                            </div> -->
+                            <div class="col-md-5 mb-4">
+                                <label class="form-label me-1 col-form-label">Temperature 2</label><br/>
+                                <b><span id="varTEMP2"></span> °C</b>
                             </div>
-
+                        </div>
                             <template v-for="param in parameters">
                                 <template v-if="param.name == 'BREW_SETPOINT'">
                                     <div class="col-md-4">

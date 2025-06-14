@@ -81,12 +81,12 @@
 
 #define TEMP_SENSOR 2  // Temp sensor type: 1 = DS18B20, 2 = TSIC306
 
-#define FEATURE_TEMP_SENSOR_2   1                       // 0 = deactivated, 1 = activated
+#define FEATURE_TEMP_SENSOR_2   0                       // 0 = deactivated, 1 = activated
 #define TEMP_SENSOR_2 1  // Temp sensor type: 1 = DS18B20, 2 = TSIC306
 
 // Log level for serial console, valid options (all with Logger::Level:: prefix) are:
 // TRACE, DEBUG, INFO, WARNING, ERROR, FATAL
-#define LOGLEVEL Logger::Level::INFO
+#define LOGLEVEL Logger::Level::DEBUG
 
 
 

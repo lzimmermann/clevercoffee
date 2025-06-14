@@ -274,7 +274,7 @@ function makeTempChart(data) {
                 value: "{YYYY}-{MM}-{DD} {HH}:{mm}:{ss}"
             },
             Object.assign({
-                label: "Current Temperature",
+                label: "Current Temperature 1",
                 scale: "C",
                 value: (u, v) => v == null ? null : v.toFixed(1) + " °C",
                 show: true,
