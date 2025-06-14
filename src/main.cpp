@@ -113,7 +113,8 @@ uint8_t wifiCredentialsSaved = 0;
 WiFiManager wm;
 const unsigned long wifiConnectionDelay = WIFICONNECTIONDELAY;
 const unsigned int maxWifiReconnects = MAXWIFIRECONNECTS;
-const char* hostname = HOSTNAME;
+String fullHostname = HOSTNAME;
+const char* hostname = nullptr;
 const char* pass = PASS;
 unsigned long lastWifiConnectionAttempt = millis();
 unsigned int wifiReconnects = 0; // actual number of reconnects
@@ -874,13 +875,6 @@ void wiFiSetup() {
 
 
 
-    // Get MAC address and create hostname with last 4 hex digits (no ':')
-    byte mac[6];
-    WiFi.macAddress(mac);
-    char macSuffix[5];
-    snprintf(macSuffix, sizeof(macSuffix), "%02X%02X", mac[4], mac[5]);
-    String fullHostname = String(hostname) + "_" + macSuffix;
-    hostname= fullHostname.c_str();
 
     wm.setHostname(hostname);
 
@@ -899,6 +893,13 @@ void wiFiSetup() {
         String macaddr5 = number2string(mac[5]);
         String completemac = macaddr0 + macaddr1 + macaddr2 + macaddr3 + macaddr4 + macaddr5;
         LOGF(DEBUG, "MAC-ADDRESS: %s", completemac.c_str());
+        fullHostname = String(HOSTNAME) + "_" + completemac;
+        hostname = fullHostname.c_str();
+
+        wm.setHostname(hostname);
+        wm.setHostname(hostname);
+
+
     }
     else {
         LOG(INFO, "WiFi connection timed out...");
@@ -1496,6 +1497,20 @@ void setup() {
             ArduinoOTA.setPassword(OTApass);  //  Password for OTA
             ArduinoOTA.begin();
         }
+
+        // if (WiFi.status() == WL_CONNECTED) {
+        // // Get MAC address and create hostname with last 4 hex digits (no ':')
+        //     byte mac[6];
+        //     WiFi.macAddress(mac);
+        //     char macSuffix[5];
+        //     snprintf(macSuffix, sizeof(macSuffix), "%02X%02X", mac[4], mac[5]);
+        //     String fullHostname = String(hostname) + "_" + macSuffix;
+        //     hostname = fullHostname.c_str();
+        //     LOGF(INFO, "Hostname for OTA: %s", hostname);
+        // }
+
+
+
 
         if (FEATURE_MQTT == 1) {
             snprintf(topic_will, sizeof(topic_will), "%s%s/%s", mqtt_topic_prefix, hostname, "status");
