@@ -872,9 +872,15 @@ void wiFiSetup() {
     }
 
 
+   // Get MAC address and create hostname with last 4 hex digits (no ':')
+    byte mac[6];
+    WiFi.macAddress(mac);
+    char macSuffix[5];
+    snprintf(macSuffix, sizeof(macSuffix), "%02X%02X", mac[4], mac[5]);
+    String fullHostname = String(hostname) + "_" + macSuffix;
+    hostname= fullHostname.c_str();
 
-
-
+    LOGF(INFO, "Hostname: %s", hostname);
 
     wm.setHostname(hostname);
 
@@ -893,11 +899,7 @@ void wiFiSetup() {
         String macaddr5 = number2string(mac[5]);
         String completemac = macaddr0 + macaddr1 + macaddr2 + macaddr3 + macaddr4 + macaddr5;
         LOGF(DEBUG, "MAC-ADDRESS: %s", completemac.c_str());
-        fullHostname = String(HOSTNAME) + "_" + completemac;
-        hostname = fullHostname.c_str();
 
-        wm.setHostname(hostname);
-        wm.setHostname(hostname);
 
 
     }
