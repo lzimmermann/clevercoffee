@@ -1490,6 +1490,18 @@ void setup() {
             ArduinoOTA.setPassword(OTApass);  //  Password for OTA
             ArduinoOTA.begin();
         }
+
+
+#if CONNECTMODE == 1 // WiFi Mode
+        if (WiFi.status() == WL_CONNECTED) {
+            configTime(0, 0, "pool.ntp.org", "time.nist.gov");
+            setenv("TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 1);
+            tzset();
+            LOG(INFO, "NTP started");
+        }
+#endif
+
+
         if (WiFi.status() == WL_CONNECTED) {
         // Get MAC address and create hostname with last 4 hex digits (no ':')
             byte mac[6];

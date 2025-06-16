@@ -86,7 +86,7 @@
 
 // Log level for serial console, valid options (all with Logger::Level:: prefix) are:
 // TRACE, DEBUG, INFO, WARNING, ERROR, FATAL
-#define LOGLEVEL Logger::Level::DEBUG
+#define LOGLEVEL Logger::Level::TRACE
 
 
 
