@@ -114,7 +114,7 @@ WiFiManager wm;
 const unsigned long wifiConnectionDelay = WIFICONNECTIONDELAY;
 const unsigned int maxWifiReconnects = MAXWIFIRECONNECTS;
 String fullHostname = HOSTNAME;
-const char* hostname = nullptr;
+char* hostname = HOSTNAME;
 const char* pass = PASS;
 unsigned long lastWifiConnectionAttempt = millis();
 unsigned int wifiReconnects = 0; // actual number of reconnects
@@ -872,15 +872,6 @@ void wiFiSetup() {
     }
 
 
-   // Get MAC address and create hostname with last 4 hex digits (no ':')
-    byte mac[6];
-    WiFi.macAddress(mac);
-    char macSuffix[5];
-    snprintf(macSuffix, sizeof(macSuffix), "%02X%02X", mac[4], mac[5]);
-    String fullHostname = String(hostname) + "_" + macSuffix;
-    hostname= fullHostname.c_str();
-
-    LOGF(INFO, "Hostname: %s", hostname);
 
     wm.setHostname(hostname);
 
@@ -1499,17 +1490,17 @@ void setup() {
             ArduinoOTA.setPassword(OTApass);  //  Password for OTA
             ArduinoOTA.begin();
         }
+        if (WiFi.status() == WL_CONNECTED) {
+        // Get MAC address and create hostname with last 4 hex digits (no ':')
+            byte mac[6];
+            WiFi.macAddress(mac);
+            char macSuffix[5];
+            snprintf(macSuffix, sizeof(macSuffix), "%02X%02X", mac[4], mac[5]);
+            fullHostname = String(hostname) + "_" + macSuffix;
+            hostname = (char*)fullHostname.c_str();
 
-        // if (WiFi.status() == WL_CONNECTED) {
-        // // Get MAC address and create hostname with last 4 hex digits (no ':')
-        //     byte mac[6];
-        //     WiFi.macAddress(mac);
-        //     char macSuffix[5];
-        //     snprintf(macSuffix, sizeof(macSuffix), "%02X%02X", mac[4], mac[5]);
-        //     String fullHostname = String(hostname) + "_" + macSuffix;
-        //     hostname = fullHostname.c_str();
-        //     LOGF(INFO, "Hostname for OTA: %s", hostname);
-        // }
+            LOGF(INFO, "FullHostname for OTA: %s", fullHostname.c_str());
+        }
 
 
 

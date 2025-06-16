@@ -69,7 +69,7 @@
 #define FEATURE_MQTT                 1                 // 0 = deactivated, 1 = activated
 #define MQTT_USERNAME                "JYaTzKFR3v"
 #define MQTT_PASSWORD                "FergKkk1AoR5qLMfW0Q7qtkN"
-#define MQTT_TOPIC_PREFIX            "Espresso"   // topic will be "<MQTT_TOPIC_PREFIX><HOSTNAME>/<READING>"
+#define MQTT_TOPIC_PREFIX            "Espresso_"   // topic will be "<MQTT_TOPIC_PREFIX><HOSTNAME><Last4DigitsOfMAC>/<READING>/"
 #define MQTT_SERVER_IP               "192.168.178.70" // IP-Address of the MQTT Server
 #define MQTT_SERVER_PORT             1887              // Port of the specified MQTT Server
 #define MQTT_HASSIO_SUPPORT          0                 // Enables the Homeassistant Auto Discovery Feature
