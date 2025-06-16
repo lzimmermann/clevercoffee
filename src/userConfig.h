@@ -57,7 +57,7 @@
 
 
 // Brew Scale
-#define FEATURE_SCALE 1 // 0 = deactivated, 1 = activated
+#define FEATURE_SCALE 0 // 0 = deactivated, 1 = activated
 #define SCALE_TYPE    0 // 0 = one HX711 per load cell, 1 = Only a single HX711 with two channels
 #define SCALE_SAMPLES 2 // Load cell sample rate
 
@@ -86,7 +86,7 @@
 
 // Log level for serial console, valid options (all with Logger::Level:: prefix) are:
 // TRACE, DEBUG, INFO, WARNING, ERROR, FATAL
-#define LOGLEVEL Logger::Level::TRACE
+#define LOGLEVEL Logger::Level::INFO
 
 
 
