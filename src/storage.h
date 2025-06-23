@@ -34,6 +34,8 @@ typedef enum {
     STO_ITEM_TARGET_BREW_WEIGHT,                    // Brew weight target
     STO_ITEM_STANDBY_MODE_ON,                       // Enable tandby mode
     STO_ITEM_STANDBY_MODE_TIME,                     // Time until heater is turned off
+    STO_ITEM_STANDBY_MODE_START,                     // Start Time for Standby Mode
+    STO_ITEM_STANDBY_MODE_END,                      // END Time for Standby Mode
     STO_ITEM_SCALE_CALIBRATION_FACTOR,              // Calibration factor for scale
     STO_ITEM_SCALE2_CALIBRATION_FACTOR,             // Calibration factor for scale 2
     STO_ITEM_SCALE_KNOWN_WEIGHT,                    // Calibration weight for scale

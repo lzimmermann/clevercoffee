@@ -220,6 +220,9 @@ double brewPIDDelay = BREW_PID_DELAY; // Time PID will be disabled after brew st
 uint8_t standbyModeOn = 0;
 double standbyModeTime = STANDBY_MODE_TIME;
 
+double standbyModeStart =  STANDBY_MODE_START;
+double standbyModeEnd = STANDBY_MODE_END;
+
 #include "standby.h"
 
 // Variables to hold PID values (Temp input, Heater output)
@@ -269,6 +272,8 @@ SysPara<double> sysParaSteamSetpoint(&steamSetpoint, STEAM_SETPOINT_MIN, STEAM_S
 SysPara<double> sysParaTargetBrewWeight(&targetBrewWeight, TARGET_BREW_WEIGHT_MIN, TARGET_BREW_WEIGHT_MAX, STO_ITEM_TARGET_BREW_WEIGHT);
 SysPara<uint8_t> sysParaStandbyModeOn(&standbyModeOn, 0, 1, STO_ITEM_STANDBY_MODE_ON);
 SysPara<double> sysParaStandbyModeTime(&standbyModeTime, STANDBY_MODE_TIME_MIN, STANDBY_MODE_TIME_MAX, STO_ITEM_STANDBY_MODE_TIME);
+SysPara<double> sysParaStandbyModeStart(&standbyModeStart, 0, 23, STO_ITEM_STANDBY_MODE_START);
+SysPara<double> sysParaStandbyModeEnd(&standbyModeEnd, 0, 23, STO_ITEM_STANDBY_MODE_END);
 SysPara<float> sysParaScaleCalibration(&scaleCalibration, -100000, 100000, STO_ITEM_SCALE_CALIBRATION_FACTOR);
 SysPara<float> sysParaScale2Calibration(&scale2Calibration, -100000, 100000, STO_ITEM_SCALE2_CALIBRATION_FACTOR);
 SysPara<float> sysParaScaleKnownWeight(&scaleKnownWeight, 0, 2000, STO_ITEM_SCALE_KNOWN_WEIGHT);
@@ -1246,6 +1251,34 @@ void setup() {
                                           .maxValue = STANDBY_MODE_TIME_MAX,
                                           .ptr = (void*)&standbyModeTime};
 
+
+
+
+    editableVars["STANDBY_MODE_START"] = {.displayName = F("Start Hour Standby Timer"),
+                                       .hasHelpText = true,
+                                       .helpText = F("Only go into standby mode if the current time is after this hour.  "),
+                                       .type = kDouble,
+                                       .section = sPowerSection,
+                                       .position = 41,
+                                       .show = [] { return true; },
+                                       .minValue = 0,
+                                       .maxValue = 23,
+                                       .ptr = (void*)&standbyModeStart};
+
+
+    editableVars["STANDBY_MODE_END"] = {.displayName = F("End Hour Standby Timer"),
+                                       .hasHelpText = true,
+                                       .helpText = F("Only go into standby mode if the current time is before this hour.  "),
+                                       .type = kDouble,
+                                       .section = sPowerSection,
+                                       .position = 42,
+                                       .show = [] { return true; },
+                                       .minValue = 0,
+                                       .maxValue = 23,
+                                       .ptr = (void*)&standbyModeEnd};
+
+
+
     editableVars["BREWCONTROL"] = {.displayName = F("Enable Brew Control"),
                                    .hasHelpText = true,
                                    .helpText = F("Enables brew-by-time or brew-by-weight"),
@@ -1988,6 +2021,8 @@ int readSysParamsFromStorage(void) {
     if (sysParaWifiCredentialsSaved.getStorage() != 0) return -1;
     if (sysParaStandbyModeOn.getStorage() != 0) return -1;
     if (sysParaStandbyModeTime.getStorage() != 0) return -1;
+    if (sysParaStandbyModeStart.getStorage() != 0) return -1;
+    if (sysParaStandbyModeEnd.getStorage() != 0) return -1;
     if (sysParaScaleCalibration.getStorage() != 0) return -1;
     if (sysParaScale2Calibration.getStorage() != 0) return -1;
     if (sysParaScaleKnownWeight.getStorage() != 0) return -1;
@@ -2032,6 +2067,8 @@ int writeSysParamsToStorage(void) {
     if (sysParaWifiCredentialsSaved.setStorage() != 0) return -1;
     if (sysParaStandbyModeOn.setStorage() != 0) return -1;
     if (sysParaStandbyModeTime.setStorage() != 0) return -1;
+    if (sysParaStandbyModeStart.setStorage() != 0) return -1;
+    if (sysParaStandbyModeEnd.setStorage() != 0) return -1;
     if (sysParaScaleCalibration.setStorage() != 0) return -1;
     if (sysParaScale2Calibration.setStorage() != 0) return -1;
     if (sysParaScaleKnownWeight.setStorage() != 0) return -1;
