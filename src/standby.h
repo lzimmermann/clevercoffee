@@ -8,7 +8,7 @@
 #include <time.h>
 #include <userConfig.h>
 
-#define TIME_TO_DISPLAY_OFF 10
+#define TIME_TO_DISPLAY_OFF 180
 
 unsigned long standbyModeStartTimeMillis = millis();
 unsigned long standbyModeRemainingTimeMillis = standbyModeTime * 60 * 1000;
