@@ -220,8 +220,8 @@ double brewPIDDelay = BREW_PID_DELAY; // Time PID will be disabled after brew st
 uint8_t standbyModeOn = 0;
 double standbyModeTime = STANDBY_MODE_TIME;
 
-double standbyModeStart =  STANDBY_MODE_START;
-double standbyModeEnd = STANDBY_MODE_END;
+int  standbyModeStart =  STANDBY_MODE_START;
+int standbyModeEnd = STANDBY_MODE_END;
 
 #include "standby.h"
 
@@ -272,8 +272,8 @@ SysPara<double> sysParaSteamSetpoint(&steamSetpoint, STEAM_SETPOINT_MIN, STEAM_S
 SysPara<double> sysParaTargetBrewWeight(&targetBrewWeight, TARGET_BREW_WEIGHT_MIN, TARGET_BREW_WEIGHT_MAX, STO_ITEM_TARGET_BREW_WEIGHT);
 SysPara<uint8_t> sysParaStandbyModeOn(&standbyModeOn, 0, 1, STO_ITEM_STANDBY_MODE_ON);
 SysPara<double> sysParaStandbyModeTime(&standbyModeTime, STANDBY_MODE_TIME_MIN, STANDBY_MODE_TIME_MAX, STO_ITEM_STANDBY_MODE_TIME);
-SysPara<double> sysParaStandbyModeStart(&standbyModeStart, 0, 23, STO_ITEM_STANDBY_MODE_START);
-SysPara<double> sysParaStandbyModeEnd(&standbyModeEnd, 0, 23, STO_ITEM_STANDBY_MODE_END);
+SysPara<int> sysParaStandbyModeStart(&standbyModeStart, 0, 23, STO_ITEM_STANDBY_MODE_START);
+SysPara<int> sysParaStandbyModeEnd(&standbyModeEnd, 0, 23, STO_ITEM_STANDBY_MODE_END);
 SysPara<float> sysParaScaleCalibration(&scaleCalibration, -100000, 100000, STO_ITEM_SCALE_CALIBRATION_FACTOR);
 SysPara<float> sysParaScale2Calibration(&scale2Calibration, -100000, 100000, STO_ITEM_SCALE2_CALIBRATION_FACTOR);
 SysPara<float> sysParaScaleKnownWeight(&scaleKnownWeight, 0, 2000, STO_ITEM_SCALE_KNOWN_WEIGHT);
@@ -1664,20 +1664,20 @@ void loopStandbyTime(){
 
   bool insideStandbyTime;
 
-  if (STANDBY_TIMER_START_HOUR <= STANDBY_TIMER_END_HOUR) {
-        insideStandbyTime = (hour >= STANDBY_TIMER_START_HOUR && hour < STANDBY_TIMER_END_HOUR);
+  if (   standbyModeStart <= standbyModeEnd) {
+        insideStandbyTime = (hour >= standbyModeStart && hour < standbyModeEnd);
         } else {
-            insideStandbyTime = (hour >= STANDBY_TIMER_START_HOUR || hour < STANDBY_TIMER_END_HOUR);
+            insideStandbyTime = (hour >= standbyModeStart || hour < standbyModeEnd);
         }
 
     if (insideStandbyTime && ((currentTime % 60000) == 0)) {
-        LOGF(INFO, "loopStandbyTime: Standby time %i in Standby hours STANDBY_TIMER_START_HOUR:%i STANDBY_TIMER_END_HOUR:%i",hour, STANDBY_TIMER_START_HOUR, STANDBY_TIMER_END_HOUR);
+        LOGF(INFO, "loopStandbyTime: Standby time %i in Standby hours STANDBY_TIMER_START_HOUR:%i STANDBY_TIMER_END_HOUR:%i",hour, standbyModeStart, standbyModeEnd);
         return;
    }
 
 
     if (!insideStandbyTime && ((currentTime % 60000) == 0)) {
-        LOGF(INFO, "loopStandbyTime: Standby time %i not in Standby hours STANDBY_TIMER_START_HOUR:%i STANDBY_TIMER_END_HOUR:%i",hour, STANDBY_TIMER_START_HOUR, STANDBY_TIMER_END_HOUR);
+        LOGF(INFO, "loopStandbyTime: Standby time %i not in Standby hours STANDBY_TIMER_START_HOUR:%i STANDBY_TIMER_END_HOUR:%i",hour, standbyModeStart, standbyModeEnd);
         resetStandbyTimer();
         pidON = 1;
         u8g2.setPowerSave(0);

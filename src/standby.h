@@ -43,14 +43,14 @@ void updateStandbyTimer(void) {
             return;
         }
 // Check if we are in standby time
-        if (STANDBY_TIMER_START_HOUR <= STANDBY_TIMER_END_HOUR) {
-                insideStandbyTime = (hour >= STANDBY_TIMER_START_HOUR && hour < STANDBY_TIMER_END_HOUR);
+        if (standbyModeStart <= standbyModeEnd) {
+                insideStandbyTime = (hour >= standbyModeStart && hour < standbyModeEnd);
                 } else {
-                    insideStandbyTime = (hour >= STANDBY_TIMER_START_HOUR || hour < STANDBY_TIMER_END_HOUR);
+                    insideStandbyTime = (hour >= standbyModeStart || hour < standbyModeEnd);
                 }
 
             if (!insideStandbyTime && ((currentTime % 60000) == 0)) {
-                LOGF(INFO, "updateStandbyTimer: Standby time %i not in Standby hours STANDBY_TIMER_START_HOUR:%i STANDBY_TIMER_END_HOUR:%i",hour, STANDBY_TIMER_START_HOUR, STANDBY_TIMER_END_HOUR);
+                LOGF(INFO, "updateStandbyTimer: Standby time %i not in Standby hours STANDBY_TIMER_START_HOUR:%i STANDBY_TIMER_END_HOUR:%i",hour, standbyModeStart, standbyModeEnd);
                 resetStandbyTimer();
                 return;
         }
